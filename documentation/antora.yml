@@ -1,0 +1,7 @@
+name: rh-service-mesh-v2-troubleshooting
+title: Red Hat Service Mesh - Troubleshooting
+version: master
+nav:
+  - modules/ROOT/nav.adoc
+
+start_page: ROOT:index.adoc

@@ -1,0 +1,22 @@
+# Red Hat Service Mesh: Troubleshooting
+
+## Introduction
+
+The general idea of _Red Hat Service Mesh: Troubleshooting_ tutorial is to get a deeply understanding of the following points:
+
+- Service Mesh Communication Flows
+- Ingress Traffic Troubleshooting
+- Secure Ingress Traffic Troubleshooting
+- Egress Traffic Troubleshooting
+- Secure Egress Traffic Troubleshooting
+- Troubleshooting Tools
+
+## Courseware official documentation
+
+This tutorial has been developed using courseware. Please visit courseware https://redhat-scholars.github.io/build-course[documentation] for more information about this framework.
+
+## Author Information
+
+Asier Cidon @Red Hat
+
+asier.cidon@gmail.com

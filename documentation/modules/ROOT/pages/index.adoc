@@ -1,0 +1,43 @@
+= Welcome to Red Hat Service Mesh: Troubleshooting tutorial
+:page-layout: home
+:!sectids:
+
+image::logos.png[Envoy,600,200]
+
+
+[.text-center.strong]
+== Introduction
+
+The general idea of _Red Hat Service Mesh: Troubleshooting_ tutorial is to get a deeply understanding of the following points:
+
+- Service Mesh Communication Flows
+- Ingress Traffic Troubleshooting
+- Secure Ingress Traffic Troubleshooting
+- Egress Traffic Troubleshooting
+- Secure Egress Traffic Troubleshooting
+- Troubleshooting Tools
+
+[.text-center.strong]
+== Get Started
+
+First at all, it is required to review your local machine prerequisites and laboratory environment access in order to be able to start working on this tutorial.
+
+Please, follow xref:01-setup.adoc[Get Started] for more information.
+
+
+[.text-center.strong]
+== Tutorial Steps
+
+=== Deploy Jump App
+
+In this step, you will deploy a demo application in Openshift in order to have a testing environment which supports the next tutorial exercises. 
+
+xref:02-jumpapp.adoc[Start this exercise...]
+
+
+=== Service Mesh Communication Flows
+
+In this phase, you will review how Service Mesh objects are created and allow the different communication flows in Service Mesh in a specific namespace.
+
+xref:03-flows.adoc[Start this exercise...]
+
