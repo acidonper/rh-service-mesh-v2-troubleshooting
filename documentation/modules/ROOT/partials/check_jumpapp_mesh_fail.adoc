@@ -1,0 +1,33 @@
+
+- Get pods
+
+include::partial$chec_jumpapp_mesh_pod.adoc[]
+
+- Obtain external services URLs
+
+[.lines_7]
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc get routes -n istio-system | grep <user_namespace>
+----
+
+.Jump App Routes
+image::jump-app-get-routes-mesh-ok.png[]
+
+- Visit the *back*, _back-golang-<user_namespace>.<openshift_apps_domain>_, route via your web browser
+
+.Jump App Back Unavailable
+image::jump-app-unavailable-back.png[]
+
+- Visit the *front*, _front-javascript-<user_namespace>.<openshift_apps_domain>_, route via your web browser
+
+.Jump App Front Unavailable
+image::jump-app-unavailable-front.png[]
+
+IMPORTANT: It is required to accept *self-signed certificates* provided by Openshift
+
+.Openshift Self-signed Certificates Warning
+image::certs_warning.png[width=50%]
+
+

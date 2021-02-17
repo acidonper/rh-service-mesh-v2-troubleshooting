@@ -80,11 +80,6 @@ The ServiceMeshMemberRoll lists the projects belonging to the control plane. Onl
 
 In order to add this new project to the Service Mesh and make possible the traffic between each microservice, it is required to create a new _ServiceMeshMember_ object.
 
-At this moment, you are not able to access to _Jump App_ because of a set of required tasks which you have to perform next.
-
-.Frontend KO
-image::jump-app-front-ko.png[]
-
 Please, create the previous object through the respective Openshift template executing the following command: 
 
 :file: 03-jump-app-flows/05-jump-app-ns-smr.yaml
@@ -103,6 +98,20 @@ image::jump-app-ns-smr-con1.png[]
 image::jump-app-ns-smr-con2.png[]
 ._ServiceMeshMember_ Created Console - 3
 image::jump-app-ns-smr-con3.png[]
+
+[#addcert]
+== Create a custom certificate in Openshift
+
+It is time to create a new secret in Openshift to save the respective certificate files. Please, create this new *secret* executing the following command:
+
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc create -n istio-system secret tls <user_namespace>-credential --key=./03-jump-app-flows/front.jumpapp.com.key --cert=./03-jump-app-flows/front.jumpapp.com.crt
+----
+
+.Secret Created
+image::jump-app-secret-ok.png[]
 
 [#finalsteps]
 == Final Steps
@@ -205,13 +214,4 @@ NOTE: Look at the number of containers in each microservice, it must contains 2 
 :jumps: 10000
 :seconds: 1
 
-include::partial$check_jumpapp_mesh.adoc[]
-
-
-[#kiali]
-=== Visit Kiali
-
-Jump App is generating traffic flow thanks to the frontend where was defined an specific number of continuous jumps. In order to review the Service Mesh traffic flow in your project, please visit Kiali console *<kiali_url>* (_E.g. https://kiali-istio-system.apps.tutorialrhmesh.sandbox507.opentlc.com_):
-
-.Kiali Console
-image::jump-app-kiali.png[]
+include::partial$check_jumpapp_mesh_fail.adoc[]

@@ -32,7 +32,7 @@ vi params.env
 
 .params file content
 ====
-USER_NAMESPACE=user1 +
+USER_NAMESPACE=user1-namespace +
 OCP_APPS_DOMAIN=apps.tutorialrhmesh.sandbox507.opentlc.com
 ====
 
