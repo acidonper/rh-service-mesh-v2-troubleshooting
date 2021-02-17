@@ -6,6 +6,7 @@
     <title>Service Mesh Communication Flows :: Red Hat Service Mesh - Troubleshooting</title>
     <link rel="canonical" href="http://localhost:3000/rhs-build-course/index.html/rh-service-mesh-v2-troubleshooting/03-flows.html">
     <link rel="prev" href="02-jumpapp.html">
+    <link rel="next" href="04-ingress-traffic.html">
     <meta name="generator" content="Antora 2.3.4">
     <link rel="stylesheet" href="../_/css/site.css">
 <link rel="icon" href="../_/img/favicon.ico" type="image/x-icon">
@@ -129,8 +130,11 @@
     <a class="nav-link" href="#memberrol">3.2 Added a new project to Red Hat Service Mesh Control Plane</a>
   </li>
   <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#addcert">3.3 Create a custom certificate in Openshift</a>
+  </li>
+  <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="#finalsteps">3.3 Final steps</a>
+    <a class="nav-link" href="#finalsteps">3.4 Final steps</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="#annotation">3.3.1 Add Istio Sidecar annotation in Jump App deployments</a>
@@ -144,6 +148,18 @@
 </ul>
   </li>
 </ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="04-ingress-traffic.html">4. Ingress Traffic Troubleshooting</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="05-secure-ingress-traffic.html">5. Secure Ingress Traffic Troubleshooting</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="06-egress-traffic.html">6. Egress Traffic Troubleshooting</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="07-tools.html">7. Troubleshooting Tools</a>
   </li>
 </ul>
   </li>
@@ -310,15 +326,6 @@ Please, replace <strong>&lt;user_namespace&gt;</strong> with the value provided 
 <p>In order to add this new project to the Service Mesh and make possible the traffic between each microservice, it is required to create a new <em>ServiceMeshMember</em> object.</p>
 </div>
 <div class="paragraph">
-<p>At this moment, you are not able to access to <em>Jump App</em> because of a set of required tasks which you have to perform next.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/jump-app-front-ko.png" alt="jump app front ko">
-</div>
-<div class="title">Figure 5. Frontend KO</div>
-</div>
-<div class="paragraph">
 <p>Please, create the previous object through the respective Openshift template executing the following command:</p>
 </div>
 <div class="listingblock lines_space console-input">
@@ -330,7 +337,7 @@ Please, replace <strong>&lt;user_namespace&gt;</strong> with the value provided 
 <div class="content">
 <img src="_images/jump-app-ns-smr.png" alt="jump app ns smr">
 </div>
-<div class="title">Figure 6. <em>ServiceMeshMember</em> Created</div>
+<div class="title">Figure 5. <em>ServiceMeshMember</em> Created</div>
 </div>
 <div class="paragraph">
 <p>Additionally, you are able to check this new object through the Openshift Console:</p>
@@ -339,19 +346,38 @@ Please, replace <strong>&lt;user_namespace&gt;</strong> with the value provided 
 <div class="content">
 <img src="_images/jump-app-ns-smr-con1.png" alt="jump app ns smr con1">
 </div>
-<div class="title">Figure 7. <em>ServiceMeshMember</em> Created Console- 1</div>
+<div class="title">Figure 6. <em>ServiceMeshMember</em> Created Console- 1</div>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="_images/jump-app-ns-smr-con2.png" alt="jump app ns smr con2">
 </div>
-<div class="title">Figure 8. <em>ServiceMeshMember</em> Created Console - 2</div>
+<div class="title">Figure 7. <em>ServiceMeshMember</em> Created Console - 2</div>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="_images/jump-app-ns-smr-con3.png" alt="jump app ns smr con3">
 </div>
-<div class="title">Figure 9. <em>ServiceMeshMember</em> Created Console - 3</div>
+<div class="title">Figure 8. <em>ServiceMeshMember</em> Created Console - 3</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="addcert"><a class="anchor" href="#addcert"></a>Create a custom certificate in Openshift</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>It is time to create a new secret in Openshift to save the respective certificate files. Please, create this new <strong>secret</strong> executing the following command:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc create -n istio-system secret tls &lt;user_namespace&gt;-credential --key=./03-jump-app-flows/front.jumpapp.com.key --cert=./03-jump-app-flows/front.jumpapp.com.crt</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-secret-ok.png" alt="jump app secret ok">
+</div>
+<div class="title">Figure 9. Secret Created</div>
 </div>
 </div>
 </div>
@@ -541,27 +567,22 @@ Look at the number of containers in each microservice, it must contains 2 contai
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/jump-app-back-ok.png" alt="jump app back ok">
+<img src="_images/jump-app-unavailable-back.png" alt="jump app unavailable back">
 </div>
-<div class="title">Figure 20. Jump App Back</div>
+<div class="title">Figure 20. Jump App Back Unavailable</div>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Visit the <strong>front</strong>, <em>front-javascript-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;</em>, route via your web browser. In addition, configure <strong>[ 10000 ]</strong> retries with <strong>[ 1 ]</strong> interval and press <strong>[ JUMP ]</strong> and ensure the following message is displaying in your screen</p>
-<div class="literalblock">
-<div class="content">
-<pre>...{"code":200,"message":"/jump - Greetings from Python!"}</pre>
-</div>
-</div>
+<p>Visit the <strong>front</strong>, <em>front-javascript-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;</em>, route via your web browser</p>
 </li>
 </ul>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/jump-app-front-jumps-ok.png" alt="jump app front jumps ok">
+<img src="_images/jump-app-unavailable-front.png" alt="jump app unavailable front">
 </div>
-<div class="title">Figure 21. Jump App Front Web UI Multi Jumps</div>
+<div class="title">Figure 21. Jump App Front Unavailable</div>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -582,22 +603,11 @@ It is required to accept <strong>self-signed certificates</strong> provided by O
 <div class="title">Figure 22. Openshift Self-signed Certificates Warning</div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="kiali"><a class="anchor" href="#kiali"></a>Visit Kiali</h3>
-<div class="paragraph">
-<p>Jump App is generating traffic flow thanks to the frontend where was defined an specific number of continuous jumps. In order to review the Service Mesh traffic flow in your project, please visit Kiali console <strong>&lt;kiali_url&gt;</strong> (<em>E.g. <a href="https://kiali-istio-system.apps.tutorialrhmesh.sandbox507.opentlc.com" class="bare">https://kiali-istio-system.apps.tutorialrhmesh.sandbox507.opentlc.com</a></em>):</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/jump-app-kiali.png" alt="jump app kiali">
-</div>
-<div class="title">Figure 23. Kiali Console</div>
-</div>
-</div>
 </div>
 </div>
 <nav class="pagination">
   <span class="prev"><a href="02-jumpapp.html">2. Jump App Deployment</a></span>
+  <span class="next"><a href="04-ingress-traffic.html">4. Ingress Traffic Troubleshooting</a></span>
 </nav>
 </article>
 <aside class="toc sidebar" data-title="Contents" data-levels="2">

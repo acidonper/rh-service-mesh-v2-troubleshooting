@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Deploy Jump App :: Red Hat Service Mesh - Troubleshooting</title>
-    <link rel="canonical" href="http://localhost:3000/rhs-build-course/index.html/rh-service-mesh-v2-troubleshooting/02-jumpapp.html">
-    <link rel="prev" href="01-setup.html">
-    <link rel="next" href="03-flows.html">
+    <title>Service Mesh Communication Flows :: Red Hat Service Mesh - Troubleshooting</title>
+    <link rel="canonical" href="http://localhost:3000/rhs-build-course/index.html/rh-service-mesh-v2-troubleshooting/05-secure-ingress-traffic.html">
+    <link rel="prev" href="04-ingress-traffic.html">
+    <link rel="next" href="06-egress-traffic.html">
     <meta name="generator" content="Antora 2.3.4">
     <link rel="stylesheet" href="../_/css/site.css">
 <link rel="icon" href="../_/img/favicon.ico" type="image/x-icon">
@@ -83,24 +83,24 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item is-current-page" data-depth="1">
+  <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
     <a class="nav-link" href="02-jumpapp.html">2. Jump App Deployment</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#login">2.1 Login in Openshift</a>
+    <a class="nav-link" href="02-jumpapp.html#login">2.1 Login in Openshift</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#github">2.2 Clone GitHub Repository</a>
+    <a class="nav-link" href="02-jumpapp.html#github">2.2 Clone GitHub Repository</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#jumpappobjects">2.3 Create Jump App Objects in Openshift</a>
+    <a class="nav-link" href="02-jumpapp.html#jumpappobjects">2.3 Create Jump App Objects in Openshift</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#test">2.4 Confirm Jump App is already running in Openshift</a>
+    <a class="nav-link" href="02-jumpapp.html#test">2.4 Confirm Jump App is already running in Openshift</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#testapp">2.5 Access to Jump App</a>
+    <a class="nav-link" href="02-jumpapp.html#testapp">2.5 Access to Jump App</a>
   </li>
 </ul>
   </li>
@@ -152,7 +152,7 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="04-ingress-traffic.html">4. Ingress Traffic Troubleshooting</a>
   </li>
-  <li class="nav-item" data-depth="1">
+  <li class="nav-item is-current-page" data-depth="1">
     <a class="nav-link" href="05-secure-ingress-traffic.html">5. Secure Ingress Traffic Troubleshooting</a>
   </li>
   <li class="nav-item" data-depth="1">
@@ -192,115 +192,31 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="index.html">Red Hat Service Mesh - Troubleshooting</a></li>
-    <li><a href="02-jumpapp.html">2. Jump App Deployment</a></li>
+    <li><a href="05-secure-ingress-traffic.html">5. Secure Ingress Traffic Troubleshooting</a></li>
   </ul>
 </nav>
-  <div class="edit-this-page"><a href="https://github.com/acidonper/rh-service-mesh-v2-troubleshooting/edit/master/documentation/modules/ROOT/pages/02-jumpapp.adoc">Edit this Page</a></div>
+  <div class="edit-this-page"><a href="https://github.com/acidonper/rh-service-mesh-v2-troubleshooting/edit/master/documentation/modules/ROOT/pages/05-secure-ingress-traffic.adoc">Edit this Page</a></div>
   </div>
   <div class="content">
 <article class="doc">
-<h1 class="page">Deploy Jump App</h1>
+<h1 class="page">Service Mesh Communication Flows</h1>
 <div class="sect1">
-<h2 id="_deploy_jump_app_microservices"><a class="anchor" href="#_deploy_jump_app_microservices"></a>Deploy <em>Jump App</em> Microservices</h2>
+<h2 id="test"><a class="anchor" href="#test"></a>Confirm <em>Jump App</em> is running again</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><em>Jump App</em> is a microservice-based application created to emulate an enterprise application complex architecture with multi environments. This app allows users to configure a set of jumps between components and generate a continuous traffic flow defining the number of retries and their span of time.</p>
+<p>Once <em>Jump App</em> objects have been created in Openshift, it is required to follow next steps in order to ensure your demo app is running properly:</p>
 </div>
-<div class="paragraph">
-<p>First at all, it is required to deploy Jump App application in Openshift in order to have the demo application environment ready. The following steps in this section helps you to deploy <em>Jump App</em>.</p>
-</div>
-<div class="admonitionblock warning">
+<div class="admonitionblock note">
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
+<i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Please, replace <strong>&lt;user&gt;</strong>, <strong>&lt;pass&gt;</strong>, <strong>&lt;ocp_cluster_console&gt;</strong> and <strong>&lt;user_namespace&gt;</strong> with the values provided by the Instructor at the beginning of this tutorial or values obtained from openshift cluster.
+Look at the number of containers in each microservice, it must contains 2 container per each pod (<strong>READY 2/2</strong>).
 </td>
 </tr>
 </table>
-</div>
-<div class="sect2">
-<h3 id="login"><a class="anchor" href="#login"></a>Login in Openshift</h3>
-<div class="listingblock lines_space console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc login -u &lt;user&gt; -p &lt;pass&gt; &lt;ocp_cluster_console&gt;</code></pre>
-</div>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/oc_login_output.png" alt="oc login output">
-</div>
-<div class="title">Figure 1. OC CLI Login Output</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="github"><a class="anchor" href="#github"></a>Clone GitHub Repository</h3>
-<div class="paragraph">
-<p><em>Jump App Gitops</em> is one of a set of repositories developed to generate a microservice based application, named Jump App. This repository includes an automated way of deploy Jump App&#8217;s microservices and all stuff around this application (Deployments, Services, Build Configs, Pipelines, etc), including optionally CI/CD or Service Mesh objects as well.</p>
-</div>
-<div class="paragraph">
-<p>Please, follow next steps in order to download the GitHub repository code:</p>
-</div>
-<div class="listingblock lines_space console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">git clone <a href="https://github.com/acidonper/rh-service-mesh-v2-troubleshooting.git" class="bare">https://github.com/acidonper/rh-service-mesh-v2-troubleshooting.git</a></code></pre>
-</div>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/git_clone_output.png" alt="git clone output">
-</div>
-<div class="title">Figure 2. git clone output</div>
-</div>
-<div class="paragraph">
-<p>Finally, navigate to the new folder created in your system after repository download for completing all tasks included in this tutorial:</p>
-</div>
-<div class="listingblock lines_space console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd rh-service-mesh-v2-troubleshooting</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="jumpappobjects"><a class="anchor" href="#jumpappobjects"></a>Create <em>Jump App</em> Objects in Openshift</h3>
-<div class="paragraph">
-<p>First at all, it is required to modify <em>params.env</em> file to include the parameters provided by the Instructor:</p>
-</div>
-<div class="listingblock lines_7 console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">vi params.env</code></pre>
-</div>
-</div>
-<div class="exampleblock">
-<div class="title">Example 1. params file content</div>
-<div class="content">
-<div class="paragraph">
-<p>USER_NAMESPACE=user1-namespace<br>
-OCP_APPS_DOMAIN=apps.tutorialrhmesh.sandbox507.opentlc.com</p>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>Once the params file is saved, you are able to process with <em>Jump App</em> deployment phase:</p>
-</div>
-<div class="listingblock lines_7 console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f ./02-jump-app-deploy/jump-app-template.yml --param-file=./params.env --ignore-unknown-parameters | oc create -f -</code></pre>
-</div>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/jump_app_created.png" alt="jump app created">
-</div>
-<div class="title">Figure 3. Jump App Deployed</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="test"><a class="anchor" href="#test"></a>Confirm <em>Jump App</em> is already running in Openshift</h3>
-<div class="paragraph">
-<p>Once <em>Jump App</em> objects have been created in Openshift, it is required to follow next steps in order to ensure your demo app is running properly:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -311,20 +227,14 @@ OCP_APPS_DOMAIN=apps.tutorialrhmesh.sandbox507.opentlc.com</p>
 </div>
 <div class="listingblock lines_7 console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get pods -n &lt;user_namespace&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get pods</code></pre>
 </div>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/jump_app_pods.png" alt="jump app pods">
+<img src="_images/jump-app-pods-2-ok.png" alt="jump app pods 2 ok">
 </div>
-<div class="title">Figure 4. Jump App Pods</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="testapp"><a class="anchor" href="#testapp"></a>Access to <em>Jump App</em></h3>
-<div class="paragraph">
-<p>Once <em>Jump App</em> is already running in Openshift, it is time to access <em>Jump App</em> public services in order to test the application:</p>
+<div class="title">Figure 1. Jump App Pods Mesh</div>
 </div>
 <div class="ulist">
 <ul>
@@ -335,14 +245,14 @@ OCP_APPS_DOMAIN=apps.tutorialrhmesh.sandbox507.opentlc.com</p>
 </div>
 <div class="listingblock lines_7 console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get routes -n &lt;user_namespace&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get routes -n istio-system | grep &lt;user_namespace&gt;</code></pre>
 </div>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/jump-app-routes.png" alt="jump app routes">
+<img src="_images/jump-app-get-routes-mesh-ok.png" alt="jump app get routes mesh ok">
 </div>
-<div class="title">Figure 5. Jump App Routes</div>
+<div class="title">Figure 2. Jump App Routes</div>
 </div>
 <div class="ulist">
 <ul>
@@ -355,12 +265,12 @@ OCP_APPS_DOMAIN=apps.tutorialrhmesh.sandbox507.opentlc.com</p>
 <div class="content">
 <img src="_images/jump-app-back-ok.png" alt="jump app back ok">
 </div>
-<div class="title">Figure 6. Jump App Back</div>
+<div class="title">Figure 3. Jump App Back</div>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Visit the <strong>front</strong>, <em>front-javascript-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;</em>, route via your web browser, push <strong>- JUMP-</strong> button and ensure the following message is displaying in your screen:</p>
+<p>Visit the <strong>front</strong>, <em>front-javascript-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;</em>, route via your web browser. In addition, configure <strong>[ 10000 ]</strong> retries with <strong>[ 1 ]</strong> interval and press <strong>[ JUMP ]</strong> and ensure the following message is displaying in your screen</p>
 <div class="literalblock">
 <div class="content">
 <pre>...{"code":200,"message":"/jump - Greetings from Python!"}</pre>
@@ -371,9 +281,9 @@ OCP_APPS_DOMAIN=apps.tutorialrhmesh.sandbox507.opentlc.com</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/jump-app-front-ok.png" alt="jump app front ok">
+<img src="_images/jump-app-front-jumps-ok.png" alt="jump app front jumps ok">
 </div>
-<div class="title">Figure 7. Jump App Frontend Web UI</div>
+<div class="title">Figure 4. Jump App Front Web UI Multi Jumps</div>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -391,14 +301,27 @@ It is required to accept <strong>self-signed certificates</strong> provided by O
 <div class="content">
 <img src="_images/certs_warning.png" alt="certs warning" width="50%">
 </div>
-<div class="title">Figure 8. Openshift Self-signed Certificates Warning</div>
+<div class="title">Figure 5. Openshift Self-signed Certificates Warning</div>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="kiali"><a class="anchor" href="#kiali"></a>Visit Kiali</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Jump App is generating traffic flow thanks to the frontend where was defined an specific number of continuous jumps. In order to review the Service Mesh traffic flow in your project, please visit Kiali console <strong>&lt;kiali_url&gt;</strong> (<em>E.g. <a href="https://kiali-istio-system.apps.tutorialrhmesh.sandbox507.opentlc.com" class="bare">https://kiali-istio-system.apps.tutorialrhmesh.sandbox507.opentlc.com</a></em>):</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-kiali.png" alt="jump app kiali">
+</div>
+<div class="title">Figure 6. Kiali Console</div>
 </div>
 </div>
 </div>
 <nav class="pagination">
-  <span class="prev"><a href="01-setup.html">1. Setup</a></span>
-  <span class="next"><a href="03-flows.html">3. Service Mesh Communication Flows</a></span>
+  <span class="prev"><a href="04-ingress-traffic.html">4. Ingress Traffic Troubleshooting</a></span>
+  <span class="next"><a href="06-egress-traffic.html">6. Egress Traffic Troubleshooting</a></span>
 </nav>
 </article>
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
