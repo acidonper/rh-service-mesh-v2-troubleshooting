@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Service Mesh Communication Flows :: Red Hat Service Mesh - Troubleshooting</title>
+    <title>Service Mesh Ingress Traffic Flow :: Red Hat Service Mesh - Troubleshooting</title>
     <link rel="canonical" href="http://localhost:3000/rhs-build-course/index.html/rh-service-mesh-v2-troubleshooting/04-ingress-traffic.html">
     <link rel="prev" href="03-flows.html">
     <link rel="next" href="05-secure-ingress-traffic.html">
@@ -130,11 +130,8 @@
     <a class="nav-link" href="03-flows.html#memberrol">3.2 Added a new project to Red Hat Service Mesh Control Plane</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="03-flows.html#addcert">3.3 Create a custom certificate in Openshift</a>
-  </li>
-  <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="03-flows.html#finalsteps">3.4 Final steps</a>
+    <a class="nav-link" href="03-flows.html#finalsteps">3.3 Final steps</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="03-flows.html#annotation">3.3.1 Add Istio Sidecar annotation in Jump App deployments</a>
@@ -143,14 +140,86 @@
     <a class="nav-link" href="03-flows.html#routes">3.3.2 Configure Routes</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="03-flows.html#test">3.3.3 Confirm Jump App is running again</a>
+    <a class="nav-link" href="03-flows.html#test">3.4 Confirm Jump App is running again</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-flows.html#03-kiali">3.5 Visit Kiali</a>
   </li>
 </ul>
   </li>
 </ul>
   </li>
   <li class="nav-item is-current-page" data-depth="1">
-    <a class="nav-link" href="04-ingress-traffic.html">4. Ingress Traffic Troubleshooting</a>
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="04-ingress-traffic.html">4. Service Mesh Ingress Traffic Flow</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#04-ingress">4.1 Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#04-troubleshooting">4.2 Ingress Gateway Traffic Flow Troubleshooting</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="#04-customize">4.3 Customize Jump App</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#04-cust-state">4.3.1 Confirm <em>Jump App</em> state</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="#04-router">4.4 Openshift Router &#8594; Ingress Gateway Connectivity</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#04-trou-con">4.4.1 Test connectivity via command line</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#04-trou-fix">4.4.2 Fix configuration problems</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#04-trou-con-again">4.4.3 Test connectivity again via command line</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="#04-gateway">4.5 Ingress Gateway &#8594; Sidecar Connectivity</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#04-gateway-con">4.5.1 Test connectivity via command line</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#04-gateway-fix">4.5.2 Fix configuration problems</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#04-gateway-con-again">4.5.3 Test connectivity again via command line</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#04-gateway-fix2">4.5.4 Fix configuration problems</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#04-gateway-con-again2">4.5.5 Test connectivity again via command line</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="#04-sidecar">4.6 Sidecar &#8594; App Connectivity</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#04-sidecar-con">4.6.1 Test connectivity via command line</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#04-test">4.7 Confirm <em>Jump App</em> is running again</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#04-kiali">4.8 Visit Kiali</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="05-secure-ingress-traffic.html">5. Secure Ingress Traffic Troubleshooting</a>
@@ -192,19 +261,68 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="index.html">Red Hat Service Mesh - Troubleshooting</a></li>
-    <li><a href="04-ingress-traffic.html">4. Ingress Traffic Troubleshooting</a></li>
+    <li><a href="04-ingress-traffic.html">4. Service Mesh Ingress Traffic Flow</a></li>
   </ul>
 </nav>
   <div class="edit-this-page"><a href="https://github.com/acidonper/rh-service-mesh-v2-troubleshooting/edit/master/documentation/modules/ROOT/pages/04-ingress-traffic.adoc">Edit this Page</a></div>
   </div>
   <div class="content">
 <article class="doc">
-<h1 class="page">Service Mesh Communication Flows</h1>
+<h1 class="page">Service Mesh Ingress Traffic Flow</h1>
 <div class="sect1">
-<h2 id="test"><a class="anchor" href="#test"></a>Confirm <em>Jump App</em> is running again</h2>
+<h2 id="04-ingress"><a class="anchor" href="#04-ingress"></a>Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Once <em>Jump App</em> objects have been created in Openshift, it is required to follow next steps in order to ensure your demo app is running properly:</p>
+<p>During this section, you will customize <em>Jump App</em> and resolve any problems found during this customization process using the command line and Kiali as the main troubleshooting tools.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Please, replace <strong>&lt;user_namespace&gt;</strong> and <strong>&lt;openshift_apps_domain&gt;</strong> with the values provided by the Instructor at the beginning of this tutorial.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="04-troubleshooting"><a class="anchor" href="#04-troubleshooting"></a>Ingress Gateway Traffic Flow Troubleshooting</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As you might know, we have 3 important objects in Istio that are essential to redirect ingress traffic from the Ingress Gateway to the application pods in Service Mesh:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Gateways</p>
+</li>
+<li>
+<p>Virtual Services</p>
+</li>
+<li>
+<p>Destination Rules</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>During the following sections, you will work with these objects and test, step by step, each segment of ingress traffic route:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Openshift Router &#8594; Ingress Gateway</p>
+</li>
+<li>
+<p>Ingress Gateway &#8594; Sidecar</p>
+</li>
+<li>
+<p>Sidecar &#8594; App</p>
+</li>
+</ul>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -213,10 +331,51 @@
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Look at the number of containers in each microservice, it must contains 2 container per each pod (<strong>READY 2/2</strong>).
+You will use <em>OC client</em>, <em>curl</em> and <em>Kiali</em> as the main troubleshooting tools
 </td>
 </tr>
 </table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="04-customize"><a class="anchor" href="#04-customize"></a>Customize Jump App</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>First of all, it is required to modify <em>Jump App</em> Service Mesh objects in order to emulate a real life day 2 operation.</p>
+</div>
+<div class="paragraph">
+<p>Please, return to the git repository and apply some customizations through the respective Openshift template executing the following command:</p>
+</div>
+<div class="listingblock lines_space console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 04-ingress-traffic-troubleshooting/00-jump-app-ingress-customization.yaml --param-file=params.env --ignore-unknown-parameters | oc apply -f - -n &lt;user_namespace&gt;</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-mod-gw-ok.png" alt="jump app mod gw ok">
+</div>
+<div class="title">Figure 1. Jump App Customizations Applied I</div>
+</div>
+<div class="listingblock lines_space console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 04-ingress-traffic-troubleshooting/01-jump-app-back-golang-svc.yaml --param-file=params.env --ignore-unknown-parameters | oc delete -f - -n &lt;user_namespace&gt;</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-mod-svc-ok.png" alt="jump app mod svc ok">
+</div>
+<div class="title">Figure 2. Jump App Customizations Applied II</div>
+</div>
+<div class="sect2">
+<h3 id="04-cust-state"><a class="anchor" href="#04-cust-state"></a><strong>Confirm <em>Jump App</em> state</strong></h3>
+<div class="paragraph">
+<p>Once <em>Jump App</em> customizations have been applied, it is time to review your demo application services state.</p>
+</div>
+<div class="paragraph">
+<p>Please, execute the following steps in order to review your demo app current state after the customization:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -234,7 +393,7 @@ Look at the number of containers in each microservice, it must contains 2 contai
 <div class="content">
 <img src="_images/jump-app-pods-2-ok.png" alt="jump app pods 2 ok">
 </div>
-<div class="title">Figure 1. Jump App Pods Mesh</div>
+<div class="title">Figure 3. Jump App Pods Mesh</div>
 </div>
 <div class="ulist">
 <ul>
@@ -252,7 +411,566 @@ Look at the number of containers in each microservice, it must contains 2 contai
 <div class="content">
 <img src="_images/jump-app-get-routes-mesh-ok.png" alt="jump app get routes mesh ok">
 </div>
-<div class="title">Figure 2. Jump App Routes</div>
+<div class="title">Figure 4. Jump App Routes</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Visit the <strong>back</strong>, <em>back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;</em>, route via your web browser</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-unavailable-back.png" alt="jump app unavailable back">
+</div>
+<div class="title">Figure 5. Jump App Back Unavailable</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Visit the <strong>front</strong>, <em>front-javascript-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;</em>, route via your web browser.In addition, configure <strong>[ 1 ]</strong> retries with <strong>[ 1 ]</strong> interval and press <strong>[ JUMP ]</strong> and ensure the following message is displaying in your screen</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-unavailable-front.png" alt="jump app unavailable front">
+</div>
+<div class="title">Figure 6. Jump App Front with Errors</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+An error message appears when the Frontend tries to call backend services
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="04-router"><a class="anchor" href="#04-router"></a>Openshift Router &#8594; Ingress Gateway Connectivity</h2>
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-ingress-router-gw.png" alt="jump app ingress router gw">
+</div>
+</div>
+<div class="sect2">
+<h3 id="04-trou-con"><a class="anchor" href="#04-trou-con"></a><strong>Test connectivity via command line</strong></h3>
+<div class="paragraph">
+<p>In order to verify the connectivity from the <em>OCP Routers</em> to the <em>Ingress Gateway</em>, it is required to follow the next steps:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Get pods in routes namespace</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get pods -n openshift-ingress</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/ocp-routers-pods.png" alt="ocp routers pods">
+</div>
+<div class="title">Figure 7. OCP Router Pods</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Connect to the router pod</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project openshift-ingress
+oc rsh &lt;router_pod_id&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Execute a HTTP request using curl command</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">curl -XGET -v --header "Host: back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;" <a href="http://istio-ingressgateway.istio-system.svc.cluster.local:80" class="bare">http://istio-ingressgateway.istio-system.svc.cluster.local:80</a> -v</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-trou-04-gw.png" alt="jump app trou 04 gw">
+</div>
+<div class="title">Figure 8. HTTP Response Error 404</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Note that the error is 404 because of the route, or path, is not found
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="04-trou-fix"><a class="anchor" href="#04-trou-fix"></a><strong>Fix configuration problems</strong></h3>
+<div class="paragraph">
+<p>After test the connectivity from the <em>OCP routers</em> to the <em>ingress gateway</em>, you should review the <em>Gateway</em> object configuration in order to verify its definition. Please, visit the Kiali console <strong>&lt;kiali_url&gt;</strong> and review the <em>Gateway</em> object current state:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-kiali-trou-04.png" alt="jump app kiali trou 04">
+</div>
+<div class="title">Figure 9. Kiali Console</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-kiali-trou-04-error.png" alt="jump app kiali trou 04 error">
+</div>
+<div class="title">Figure 10. Kiali Console Gateway Error</div>
+</div>
+<div class="paragraph">
+<p>If you take a look at the host paths closely, you can find a bad definition because of the pattern <strong>"-fail"</strong> included in the path. Please, modify this hostname and click on <strong>[ SAVE ]</strong>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="04-trou-con-again"><a class="anchor" href="#04-trou-con-again"></a><strong>Test connectivity again via command line</strong></h3>
+<div class="paragraph">
+<p>Once <em>Gateway</em> object has been modified in Openshift, it is required to test your application again through the OCP router:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Get pods in routes namespace</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get pods -n openshift-ingress</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/ocp-routers-pods.png" alt="ocp routers pods">
+</div>
+<div class="title">Figure 11. OCP Routers Pods</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Connect to the router pod</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project openshift-ingress
+oc rsh &lt;router_pod_id&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Execute a HTTP request using curl command</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">curl -XGET -v --header "Host: back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;" <a href="http://istio-ingressgateway.istio-system.svc.cluster.local:80" class="bare">http://istio-ingressgateway.istio-system.svc.cluster.local:80</a> -v</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-trou-04-gw-ok.png" alt="jump app trou 04 gw ok">
+</div>
+<div class="title">Figure 12. HTTP Response 503</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+At this time, you obtain a 503 error because the service is unavailable but this host exists and it is reachable
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="04-gateway"><a class="anchor" href="#04-gateway"></a>Test Ingress Gateway &#8594; Sidecar Connectivity</h2>
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-ingress-gw-sidecar.png" alt="jump app ingress gw sidecar">
+</div>
+</div>
+<div class="sect2">
+<h3 id="04-gateway-con"><a class="anchor" href="#04-gateway-con"></a><strong>Test connectivity via command line</strong></h3>
+<div class="paragraph">
+<p>In order to verify the connectivity from the <em>Ingress gateway</em> to the <em>Envoy Sidecar</em>, via back-golang <em>k8s service</em>, it is required to follow the next steps:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Get pods in <em>istio-system</em> namespace</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get pods -n istio-system</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/ocp-routers-pods.png" alt="ocp routers pods">
+</div>
+<div class="title">Figure 13. Istio ControlPlane Pods</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Connect to the <em>Ingress Gateway</em> pod</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project istio-system
+oc rsh &lt;ingress_gateway_pod_id&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Execute a HTTP request using curl command</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">curl -XGET -v --header "Host: back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;" <a href="http://back-golang.&lt;user_namespace&gt;.svc.cluster.local:8442" class="bare">http://back-golang.&lt;user_namespace&gt;.svc.cluster.local:8442</a> -v</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-trou-04-svc.png" alt="jump app trou 04 svc">
+</div>
+<div class="title">Figure 14. HTTP Response Error</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+At this time, you obtain <em>"Could not resolve host: back-golang.user1-namespace.svc.cluster.local"</em> because <em>back-golang.svc.cluster.local</em> k8s service is not found
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="04-gateway-fix"><a class="anchor" href="#04-gateway-fix"></a><strong>Fix configuration problems</strong></h3>
+<div class="paragraph">
+<p>After test the connectivity from the from the <em>Ingress Gateway</em> to the <em>Envoy Sidecar</em>, via back-golang <em>k8s service</em>, you should create the <em>back-golang</em> k8s service again in order to allow this connections.</p>
+</div>
+<div class="listingblock lines_space console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 04-ingress-traffic-troubleshooting/01-jump-app-back-golang-svc.yaml --param-file=params.env --ignore-unknown-parameters | oc apply -f - -n &lt;user_namespace&gt;</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-trou-04-svc-created.png" alt="jump app trou 04 svc created">
+</div>
+<div class="title">Figure 15. back-golang k8s Service Created</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="04-gateway-con-again"><a class="anchor" href="#04-gateway-con-again"></a><strong>Test connectivity again via command line</strong></h3>
+<div class="paragraph">
+<p>Once the k8s service has been created again in Openshift, it is required to test your application again through the <em>Ingress Gateway</em>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Get pods in <em>istio-system</em> namespace</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get pods -n istio-system</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/ocp-routers-pods.png" alt="ocp routers pods">
+</div>
+<div class="title">Figure 16. Istio ControlPlane Pods</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Connect to the <em>ingress gateway</em> pod</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project istio-system
+oc rsh &lt;ingress_gateway_pod_id&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Execute a HTTP request using curl command</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">curl -XGET -v --header "Host: back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;" <a href="http://back-golang.&lt;user_namespace&gt;.svc.cluster.local:8442" class="bare">http://back-golang.&lt;user_namespace&gt;.svc.cluster.local:8442</a> -v</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-trou-04-gw-ok.png" alt="jump app trou 04 gw ok">
+</div>
+<div class="title">Figure 17. HTTP Response 503</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+At this time, you obtain a 503 error because the service is unavailable but the k8s service is OK
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="04-gateway-fix2"><a class="anchor" href="#04-gateway-fix2"></a><strong>Fix configuration problems</strong></h3>
+<div class="paragraph">
+<p>After test the connectivity from the from the <em>Ingress Gateway</em> to the <em>Envoy Sidecar</em>, via <em>k8s service</em>, you should review the <em>Virtual Service</em> and <em>Destination Rule</em> objects configuration in order to verify their definition. Please, visit the Kiali console <strong>&lt;kiali_url&gt;</strong> and review the objects general state:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-kiali-trou-04-vs-dr.png" alt="jump app kiali trou 04 vs dr">
+</div>
+<div class="title">Figure 18. Kiali Console</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-kiali-trou-04-error-vs.png" alt="jump app kiali trou 04 error vs">
+</div>
+<div class="title">Figure 19. Kiali Console Virtual Service Error</div>
+</div>
+<div class="paragraph">
+<p>If you take a look at the host paths closely you can find a bad definition because of the pattern <strong>"-fail"</strong> included in the path. Please, modify this hostname and click on <strong>[ SAVE ]</strong>.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-kiali-trou-04-error-dr.png" alt="jump app kiali trou 04 error dr">
+</div>
+<div class="title">Figure 20. Kiali Console Destination Rule Error</div>
+</div>
+<div class="paragraph">
+<p>Lastly, if you take a look at the label version you can find a bad definition. Please, replace <strong>fail</strong> with <strong>v1</strong> version and click on <strong>[ SAVE ]</strong>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="04-gateway-con-again2"><a class="anchor" href="#04-gateway-con-again2"></a><strong>Test connectivity again via command line</strong></h3>
+<div class="paragraph">
+<p>Once these objects have been modified in Kiali, it is required to test your application again through the Ingress Gateway:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Get pods in <em>istio-system</em> namespace</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get pods -n istio-system</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/ocp-routers-pods.png" alt="ocp routers pods">
+</div>
+<div class="title">Figure 21. Istio ControlPlane Pods</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Connect to the <em>Ingress Gateway</em> pod</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project istio-system
+oc rsh &lt;ingress_gateway_pod_id&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Execute a HTTP request using curl command</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">curl -XGET -v --header "Host: back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;" <a href="http://istio-ingressgateway.istio-system.svc.cluster.local:80" class="bare">http://istio-ingressgateway.istio-system.svc.cluster.local:80</a> -v</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-trou-04-vsdr-ok.png" alt="jump app trou 04 vsdr ok">
+</div>
+<div class="title">Figure 22. HTTP Response 200</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="04-sidecar"><a class="anchor" href="#04-sidecar"></a>Test Sidecar &#8594; App Connectivity</h2>
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-ingress-sidecar-app.png" alt="jump app ingress sidecar app">
+</div>
+</div>
+<div class="sect2">
+<h3 id="04-sidecar-test"><a class="anchor" href="#04-sidecar-test"></a><strong>Test connectivity via command line</strong></h3>
+<div class="paragraph">
+<p>In order to verify the connectivity from the <em>Envoy Sidecar</em> to the <em>App</em> containers in the same pods, it is required to follow the next steps:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Get pods in your namespace</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get pods -n &lt;user_namespace&gt;</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump_app_pods.png" alt="jump app pods">
+</div>
+<div class="title">Figure 23. Jump App Pods</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Connect to the <em>back-golang</em> pod</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project &lt;user_namespace&gt;
+oc exec -ti &lt;back-golang_pod_id&gt; -c istio-proxy -- sh</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Execute a HTTP request using curl command</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">curl -XGET -v --header "Host: back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;" <a href="http://localhost:8442" class="bare">http://localhost:8442</a></code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-trou-04-sidecar-ok.png" alt="jump app trou 04 sidecar ok">
+</div>
+<div class="title">Figure 24. HTTP Response 200</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="04-test"><a class="anchor" href="#04-test"></a>Confirm <em>Jump App</em> is running again</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Once <em>Jump App</em> objects have been modified and fixed in Kiali and Openshift, it is required to follow the next steps in order to ensure your demo app is running properly:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Get pods</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get pods</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-pods-2-ok.png" alt="jump app pods 2 ok">
+</div>
+<div class="title">Figure 25. Jump App Pods Mesh</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Obtain external services URLs</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get routes -n istio-system | grep &lt;user_namespace&gt;</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-get-routes-mesh-ok.png" alt="jump app get routes mesh ok">
+</div>
+<div class="title">Figure 26. Jump App Routes</div>
 </div>
 <div class="ulist">
 <ul>
@@ -265,12 +983,12 @@ Look at the number of containers in each microservice, it must contains 2 contai
 <div class="content">
 <img src="_images/jump-app-back-ok.png" alt="jump app back ok">
 </div>
-<div class="title">Figure 3. Jump App Back</div>
+<div class="title">Figure 27. Jump App Back</div>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Visit the <strong>front</strong>, <em>front-javascript-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;</em>, route via your web browser. In addition, configure <strong>[ 10000 ]</strong> retries with <strong>[ 1 ]</strong> interval and press <strong>[ JUMP ]</strong> and ensure the following message is displaying in your screen</p>
+<p>Visit the <strong>front</strong>, <em>front-javascript-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;</em>, route via your web browser. In addition, configure <strong>[ 1000 ]</strong> retries with <strong>[ 1 ]</strong> interval and press <strong>[ JUMP ]</strong> and ensure the following message is displaying in your screen</p>
 <div class="literalblock">
 <div class="content">
 <pre>...{"code":200,"message":"/jump - Greetings from Python!"}</pre>
@@ -283,7 +1001,7 @@ Look at the number of containers in each microservice, it must contains 2 contai
 <div class="content">
 <img src="_images/jump-app-front-jumps-ok.png" alt="jump app front jumps ok">
 </div>
-<div class="title">Figure 4. Jump App Front Web UI Multi Jumps</div>
+<div class="title">Figure 28. Jump App Front Web UI Multi Jumps</div>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -301,21 +1019,21 @@ It is required to accept <strong>self-signed certificates</strong> provided by O
 <div class="content">
 <img src="_images/certs_warning.png" alt="certs warning" width="50%">
 </div>
-<div class="title">Figure 5. Openshift Self-signed Certificates Warning</div>
+<div class="title">Figure 29. Openshift Self-signed Certificates Warning</div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="kiali"><a class="anchor" href="#kiali"></a>Visit Kiali</h2>
+<h2 id="04-kiali"><a class="anchor" href="#04-kiali"></a>Visit Kiali</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Jump App is generating traffic flow thanks to the frontend where was defined an specific number of continuous jumps. In order to review the Service Mesh traffic flow in your project, please visit Kiali console <strong>&lt;kiali_url&gt;</strong> (<em>E.g. <a href="https://kiali-istio-system.apps.tutorialrhmesh.sandbox507.opentlc.com" class="bare">https://kiali-istio-system.apps.tutorialrhmesh.sandbox507.opentlc.com</a></em>):</p>
+<p>At this time, <em>Jump App</em> is generating traffic flow thanks to the frontend where it was given an specific number of continuous jumps. In order to review the Service Mesh traffic flow in your project, please visit the Kiali console <strong>&lt;kiali_url&gt;</strong>:</p>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="_images/jump-app-kiali.png" alt="jump app kiali">
 </div>
-<div class="title">Figure 6. Kiali Console</div>
+<div class="title">Figure 30. Kiali Console</div>
 </div>
 </div>
 </div>

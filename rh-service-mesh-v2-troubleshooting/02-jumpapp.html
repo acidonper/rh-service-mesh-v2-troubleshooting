@@ -130,11 +130,8 @@
     <a class="nav-link" href="03-flows.html#memberrol">3.2 Added a new project to Red Hat Service Mesh Control Plane</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="03-flows.html#addcert">3.3 Create a custom certificate in Openshift</a>
-  </li>
-  <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="03-flows.html#finalsteps">3.4 Final steps</a>
+    <a class="nav-link" href="03-flows.html#finalsteps">3.3 Final steps</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="03-flows.html#annotation">3.3.1 Add Istio Sidecar annotation in Jump App deployments</a>
@@ -143,14 +140,86 @@
     <a class="nav-link" href="03-flows.html#routes">3.3.2 Configure Routes</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="03-flows.html#test">3.3.3 Confirm Jump App is running again</a>
+    <a class="nav-link" href="03-flows.html#test">3.4 Confirm Jump App is running again</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-flows.html#03-kiali">3.5 Visit Kiali</a>
   </li>
 </ul>
   </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="04-ingress-traffic.html">4. Ingress Traffic Troubleshooting</a>
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="04-ingress-traffic.html">4. Service Mesh Ingress Traffic Flow</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-ingress-traffic.html#04-ingress">4.1 Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-ingress-traffic.html#04-troubleshooting">4.2 Ingress Gateway Traffic Flow Troubleshooting</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="04-ingress-traffic.html#04-customize">4.3 Customize Jump App</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-ingress-traffic.html#04-cust-state">4.3.1 Confirm <em>Jump App</em> state</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="04-ingress-traffic.html#04-router">4.4 Openshift Router &#8594; Ingress Gateway Connectivity</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-ingress-traffic.html#04-trou-con">4.4.1 Test connectivity via command line</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-ingress-traffic.html#04-trou-fix">4.4.2 Fix configuration problems</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-ingress-traffic.html#04-trou-con-again">4.4.3 Test connectivity again via command line</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="04-ingress-traffic.html#04-gateway">4.5 Ingress Gateway &#8594; Sidecar Connectivity</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-ingress-traffic.html#04-gateway-con">4.5.1 Test connectivity via command line</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-ingress-traffic.html#04-gateway-fix">4.5.2 Fix configuration problems</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-ingress-traffic.html#04-gateway-con-again">4.5.3 Test connectivity again via command line</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-ingress-traffic.html#04-gateway-fix2">4.5.4 Fix configuration problems</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-ingress-traffic.html#04-gateway-con-again2">4.5.5 Test connectivity again via command line</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="04-ingress-traffic.html#04-sidecar">4.6 Sidecar &#8594; App Connectivity</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-ingress-traffic.html#04-sidecar-con">4.6.1 Test connectivity via command line</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-ingress-traffic.html#04-test">4.7 Confirm <em>Jump App</em> is running again</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-ingress-traffic.html#04-kiali">4.8 Visit Kiali</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="05-secure-ingress-traffic.html">5. Secure Ingress Traffic Troubleshooting</a>
@@ -207,7 +276,7 @@
 <p><em>Jump App</em> is a microservice-based application created to emulate an enterprise application complex architecture with multi environments. This app allows users to configure a set of jumps between components and generate a continuous traffic flow defining the number of retries and their span of time.</p>
 </div>
 <div class="paragraph">
-<p>First at all, it is required to deploy Jump App application in Openshift in order to have the demo application environment ready. The following steps in this section helps you to deploy <em>Jump App</em>.</p>
+<p>First of all, it is required to deploy Jump App application in Openshift in order to have the demo application environment ready. The following steps in this section helps you to deploy <em>Jump App</em>.</p>
 </div>
 <div class="admonitionblock warning">
 <table>
@@ -238,14 +307,14 @@ Please, replace <strong>&lt;user&gt;</strong>, <strong>&lt;pass&gt;</strong>, <s
 <div class="sect2">
 <h3 id="github"><a class="anchor" href="#github"></a>Clone GitHub Repository</h3>
 <div class="paragraph">
-<p><em>Jump App Gitops</em> is one of a set of repositories developed to generate a microservice based application, named Jump App. This repository includes an automated way of deploy Jump App&#8217;s microservices and all stuff around this application (Deployments, Services, Build Configs, Pipelines, etc), including optionally CI/CD or Service Mesh objects as well.</p>
+<p><em>Jump App GitOps</em> is one of a set of repositories developed to generate a microservice based application, named Jump App. This repository includes an automated way of deploying Jump App&#8217;s microservices and all stuff around this application (Deployments, Services, Build Configs, Pipelines, etc), including optionally CI/CD or Service Mesh objects as well.</p>
 </div>
 <div class="paragraph">
-<p>Please, follow next steps in order to download the GitHub repository code:</p>
+<p>Please, follow the next steps in order to download the GitHub repository code:</p>
 </div>
 <div class="listingblock lines_space console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">git clone <a href="https://github.com/acidonper/rh-service-mesh-v2-troubleshooting.git" class="bare">https://github.com/acidonper/rh-service-mesh-v2-troubleshooting.git</a></code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">git clone <a href="https://github.com/acidonper/rh-service-mesh-v2-troubleshooting-resources.git" class="bare">https://github.com/acidonper/rh-service-mesh-v2-troubleshooting-resources.git</a></code></pre>
 </div>
 </div>
 <div class="imageblock">
@@ -259,14 +328,14 @@ Please, replace <strong>&lt;user&gt;</strong>, <strong>&lt;pass&gt;</strong>, <s
 </div>
 <div class="listingblock lines_space console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd rh-service-mesh-v2-troubleshooting</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd rh-service-mesh-v2-troubleshooting-resources</code></pre>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="jumpappobjects"><a class="anchor" href="#jumpappobjects"></a>Create <em>Jump App</em> Objects in Openshift</h3>
 <div class="paragraph">
-<p>First at all, it is required to modify <em>params.env</em> file to include the parameters provided by the Instructor:</p>
+<p>First of all, it is required to modify <em>params.env</em> file to include the parameters provided by the Instructor:</p>
 </div>
 <div class="listingblock lines_7 console-input">
 <div class="content">
@@ -287,7 +356,8 @@ OCP_APPS_DOMAIN=apps.tutorialrhmesh.sandbox507.opentlc.com</p>
 </div>
 <div class="listingblock lines_7 console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f ./02-jump-app-deploy/jump-app-template.yml --param-file=./params.env --ignore-unknown-parameters | oc create -f - -n &lt;user_namespace&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc project &lt;user_namespace&gt;
+oc process -f ./02-jump-app-deploy/jump-app-template.yml --param-file=./params.env --ignore-unknown-parameters | oc apply -f -</code></pre>
 </div>
 </div>
 <div class="imageblock">
@@ -298,9 +368,9 @@ OCP_APPS_DOMAIN=apps.tutorialrhmesh.sandbox507.opentlc.com</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="test"><a class="anchor" href="#test"></a>Confirm <em>Jump App</em> is already running in Openshift</h3>
+<h3 id="test"><a class="anchor" href="#test"></a>Confirm that <em>Jump App</em> is already running in Openshift</h3>
 <div class="paragraph">
-<p>Once <em>Jump App</em> objects have been created in Openshift, it is required to follow next steps in order to ensure your demo app is running properly:</p>
+<p>Once <em>Jump App</em> objects have been created in Openshift, it is required to follow the next steps in order to ensure your demo app is running properly:</p>
 </div>
 <div class="ulist">
 <ul>
