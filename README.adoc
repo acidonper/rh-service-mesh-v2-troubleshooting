@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The general idea of _Red Hat Service Mesh: Troubleshooting_ tutorial is to get a deeply understanding of the following points:
+The general idea of _Red Hat Service Mesh: Troubleshooting_ tutorial is to get a deep understanding of the following points:
 
 - Service Mesh Communication Flows
 - Ingress Traffic Troubleshooting

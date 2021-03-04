@@ -8,7 +8,7 @@ image::logos.png[Envoy,600,200]
 [.text-center.strong]
 == Introduction
 
-The general idea of _Red Hat Service Mesh: Troubleshooting_ tutorial is to get a deeply understanding of the following points:
+The general idea of _Red Hat Service Mesh: Troubleshooting_ tutorial is to get a deep understanding of the following points:
 
 - Service Mesh Communication Flows
 - Ingress Traffic Troubleshooting
@@ -20,7 +20,7 @@ The general idea of _Red Hat Service Mesh: Troubleshooting_ tutorial is to get a
 [.text-center.strong]
 == Get Started
 
-First at all, it is required to review your local machine prerequisites and laboratory environment access in order to be able to start working on this tutorial.
+First of all, it is required to review your local machine prerequisites and laboratory environment access in order to be able to start working on this tutorial.
 
 Please, follow xref:01-setup.adoc[Get Started] for more information.
 
@@ -40,4 +40,12 @@ xref:02-jumpapp.adoc[Start this exercise...]
 In this phase, you will review how Service Mesh objects are created and allow the different communication flows in Service Mesh in a specific namespace.
 
 xref:03-flows.adoc[Start this exercise...]
+
+
+=== Ingress Traffic Troubleshooting
+
+In this phase, you will customize _Jump App_ and resolve any problem found during this customization process.
+
+xref:04-ingress-traffic.adoc[Start this exercise...]
+
 

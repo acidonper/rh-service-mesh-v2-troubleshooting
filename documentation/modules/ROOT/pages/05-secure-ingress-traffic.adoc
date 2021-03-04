@@ -1,22 +1,29 @@
 = Service Mesh Communication Flows
 
-[#test]
-== Confirm _Jump App_ is running again
+[#addcert]
+== Create a Custom Certificate in Openshift
 
-Once _Jump App_ objects have been created in Openshift, it is required to follow next steps in order to ensure your demo app is running properly:
+It is time to create a new secret in Openshift to save the respective certificate files. Please, create this new *secret* executing the following command:
 
-NOTE: Look at the number of containers in each microservice, it must contains 2 container per each pod (*READY 2/2*). 
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc create -n istio-system secret tls <user_namespace>-credential --key=./03-jump-app-flows/front.jumpapp.com.key --cert=./03-jump-app-flows/front.jumpapp.com.crt
+----
 
-:jumps: 10000
-:seconds: 1
+.Secret Created
+image::jump-app-secret-ok.png[]
 
-include::partial$check_jumpapp_mesh.adoc[]
+== Modify Golang Route in istio-system Namespace
 
+Once "regular" routes are deleted, it is required to create the new ones.
 
-[#kiali]
-== Visit Kiali
+Please, create new *routes* in **istio-system** namespace through the respective Openshift template executing the following command: 
 
-Jump App is generating traffic flow thanks to the frontend where was defined an specific number of continuous jumps. In order to review the Service Mesh traffic flow in your project, please visit Kiali console *<kiali_url>* (_E.g. https://kiali-istio-system.apps.tutorialrhmesh.sandbox507.opentlc.com_):
+:file: 03-jump-app-flows/04-jump-app-routes.yaml
+:namespace: istio-system
 
-.Kiali Console
-image::jump-app-kiali.png[]
+include::partial$oc_process_create.adoc[]
+
+.Mesh Routes Created
+image::jump-app-routes-mesh-ok.png[]

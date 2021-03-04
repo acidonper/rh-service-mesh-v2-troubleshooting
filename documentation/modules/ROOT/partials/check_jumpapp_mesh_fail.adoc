@@ -20,14 +20,10 @@ image::jump-app-get-routes-mesh-ok.png[]
 .Jump App Back Unavailable
 image::jump-app-unavailable-back.png[]
 
-- Visit the *front*, _front-javascript-<user_namespace>.<openshift_apps_domain>_, route via your web browser
+- Visit the *front*, _front-javascript-<user_namespace>.<openshift_apps_domain>_, route via your web browser.In addition, configure *[ 1 ]* retries with *[ 1 ]* interval and press *[ JUMP ]* and ensure the following message is displaying in your screen
 
-.Jump App Front Unavailable
+.Jump App Front with Errors
 image::jump-app-unavailable-front.png[]
 
-IMPORTANT: It is required to accept *self-signed certificates* provided by Openshift
-
-.Openshift Self-signed Certificates Warning
-image::certs_warning.png[width=50%]
-
+NOTE: An error message appears when the Frontend tries to call backend services
 
