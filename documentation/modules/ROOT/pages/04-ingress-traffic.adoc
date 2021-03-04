@@ -54,6 +54,8 @@ Once _Jump App_ customizations have been applied, it is time to review your demo
 
 Please, execute the following steps in order to review your demo app current state after the customization:
 
+:errorimage: jump-app-unavailable-back.png
+
 include::partial$check_jumpapp_mesh_fail.adoc[]
 
 [#04-router]

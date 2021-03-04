@@ -1,29 +1,151 @@
-= Service Mesh Communication Flows
+= Service Mesh Secure Ingress Traffic Flow
 
-[#addcert]
-== Create a Custom Certificate in Openshift
+[#05-sds]
+== Secure Gateways with SDS
 
-It is time to create a new secret in Openshift to save the respective certificate files. Please, create this new *secret* executing the following command:
+As you know, Gateway describes a load balancer operating at the edge of the mesh receiving incoming or outgoing HTTP/TCP connections.
+
+During this step, you will review how to expose a secure HTTPS service through Openshift Router using a Gateway, a custom certificate and Istio Secret Discovery Service (SDS).
+
+[#05-sds-addcert]
+=== Create in Istio the Custom Certificate using SDS
+
+In order to configure a new certificate in SDS, it is required to create a new _secret_ in Openshift to save the respective files.
+
+Please, create this new *secret* executing the following command:
 
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-oc create -n istio-system secret tls <user_namespace>-credential --key=./03-jump-app-flows/front.jumpapp.com.key --cert=./03-jump-app-flows/front.jumpapp.com.crt
+oc create -n istio-system secret tls <user_namespace>-credential --key=./05-secure-ingress-traffic-troubleshooting/front.jumpapp.com.key --cert=./05-secure-ingress-traffic-troubleshooting/front.jumpapp.com.crt
 ----
 
 .Secret Created
 image::jump-app-secret-ok.png[]
 
-== Modify Golang Route in istio-system Namespace
+[#05-sds-route]
+=== Modify back-golang Route in istio-system Namespace
 
-Once "regular" routes are deleted, it is required to create the new ones.
+Once the new _secret_ has been created, it is time to modify the back-golang OCP route in order to configure it as a _passthrough_ route. With passthrough termination, encrypted traffic is sent straight to the _Ingress Gateway_ without the router providing TLS termination. Therefore no key or certificate is required.
 
-Please, create new *routes* in **istio-system** namespace through the respective Openshift template executing the following command: 
+Please, modify back-golang OCP route in **istio-system** namespace through the respective Openshift template executing the following command: 
 
-:file: 03-jump-app-flows/04-jump-app-routes.yaml
+:file: 05-secure-ingress-traffic-troubleshooting/00-jump-app-golang-route.yaml
 :namespace: istio-system
 
-include::partial$oc_process_create.adoc[]
+include::partial$oc_process_apply.adoc[]
 
-.Mesh Routes Created
-image::jump-app-routes-mesh-ok.png[]
+.back-golang Route Modified
+image::jump-app-routes-sds-mod.png[]
+
+[#05-sds-gw]
+=== Configure Gateway
+
+If you remember, a gateway describes a load balancer operating at the edge of the mesh receiving incoming or outgoing HTTP/TCP connections.
+
+In order to serve this new certificate when you are accessing to _Jump App_ back-golang service, it is required to modify the respective Gateway. 
+
+Please, modify existing frontend *gateway* object executing the following command:
+
+:file: 05-secure-ingress-traffic-troubleshooting/01-jump-app-golang-gw.yaml
+:namespace: <user_namespace>
+
+include::partial$oc_process_apply.adoc[]
+
+.back-golang Gateway Modified
+image::jump-app-gw-ok.png[]
+
+In order to ensure the Istio Secret Discovery Service (SDS) has been configured properly, you can review the _istio ingress gateway_ pod as shown the following picture:
+
+.Secret Added to SDS
+image::jump-app-sds-ok.png[]
+
+[#05-test]
+== Confirm _Jump App_ is running
+
+Once _Jump App_ SDS has been modified, it is required to follow the next steps in order to ensure your demo app is running properly:
+
+Please, execute the following steps in order to review your demo app current state after the customization:
+
+:errorimage: jump-app-unavailable-back-route.png
+
+include::partial$check_jumpapp_mesh_fail.adoc[]
+
+
+[#05-router]
+== Openshift Router -> Ingress Gateway Secure Connectivity
+
+image::jump-app-ingress-router-gw-sec.png[]
+
+[#04-trou-con]
+=== *Test connectivity via command line*
+
+In order to verify the secure connectivity from the _OCP Routers_ to the _Ingress Gateway_, it is required to follow the next steps:
+
+* Get pods in routes namespace
+
+[.lines_7]
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc get pods -n openshift-ingress
+----
+
+.OCP Router Pods
+image::ocp-routers-pods.png[]
+
+* Connect to the router pod
+
+[.lines_7]
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc project openshift-ingress
+oc rsh <router_pod_id> 
+----
+
+* Execute a HTTP request using curl command
+
+[.lines_7]
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+curl --connect-to back-golang-<user_namespace>.<openshift_apps_domain>:443:istio-ingressgateway.istio-system.svc.cluster.local:443 https://back-golang-<user_namespace>.<openshift_apps_domain>/ -k -v
+----
+
+.HTTP Response 200
+image::jump-app-trou-05-gw.png[]
+
+IMPORTANT: Note that the _Ingress Gateway_ is exposing back-golang service properly. For this reason, you can conclude the problem is located at the OCP route level
+
+[#05-trou-fix]
+=== *Fix configuration problems*
+
+After test the connectivity from the _OCP routers_ to the _ingress gateway_, you should review the _Route_ object configuration in order to verify its definition. Please, visit the OCP console *<ocp_cluster_console>* and review this object current state:
+
+.OCP Console
+image::jump-app-ocp-trou-05.png[]
+
+.OCP Console Bad Configuration
+image::jump-app-ocp-trou-05-error.png[]
+
+If you take a look at the _target port_ closely, you can find _http2_. In order to support passthrough routes and connect with _Ingress Gateway_ secure ports, it is required define a secured port. Please, _edit route_, define _https_ as target port and click on *[ SAVE ]*.
+
+[#04-test]
+== Confirm _Jump App_ is running again
+
+Once _Jump App_ objects have been modified and fixed in Kiali and Openshift, it is required to follow the next steps in order to ensure your demo app is running properly:
+
+:jumps: 1000
+:seconds: 1
+
+include::partial$check_jumpapp_mesh.adoc[]
+
+
+[#04-kiali]
+== Visit Kiali
+
+At this time, _Jump App_ is generating traffic flow thanks to the frontend where it was given an specific number of continuous jumps. In order to review the Service Mesh traffic flow in your project, please visit the Kiali console *<kiali_url>*:
+
+.Kiali Console
+image::jump-app-kiali.png[]

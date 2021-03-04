@@ -18,12 +18,12 @@ image::jump-app-get-routes-mesh-ok.png[]
 - Visit the *back*, _back-golang-<user_namespace>.<openshift_apps_domain>_, route via your web browser
 
 .Jump App Back Unavailable
-image::jump-app-unavailable-back.png[]
+image::{errorimage}[]
 
 - Visit the *front*, _front-javascript-<user_namespace>.<openshift_apps_domain>_, route via your web browser.In addition, configure *[ 1 ]* retries with *[ 1 ]* interval and press *[ JUMP ]* and ensure the following message is displaying in your screen
 
 .Jump App Front with Errors
 image::jump-app-unavailable-front.png[]
 
-NOTE: An error message appears when the Frontend tries to call backend services
+NOTE: An error message appears when the frontend tries to call backend services
 
