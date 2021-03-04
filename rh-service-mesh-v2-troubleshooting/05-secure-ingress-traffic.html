@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Service Mesh Communication Flows :: Red Hat Service Mesh - Troubleshooting</title>
+    <title>Service Mesh Secure Ingress Traffic Flow :: Red Hat Service Mesh - Troubleshooting</title>
     <link rel="canonical" href="http://localhost:3000/rhs-build-course/index.html/rh-service-mesh-v2-troubleshooting/05-secure-ingress-traffic.html">
     <link rel="prev" href="04-ingress-traffic.html">
     <link rel="next" href="06-egress-traffic.html">
@@ -268,16 +268,27 @@
   </div>
   <div class="content">
 <article class="doc">
-<h1 class="page">Service Mesh Communication Flows</h1>
+<h1 class="page">Service Mesh Secure Ingress Traffic Flow</h1>
 <div class="sect1">
-<h2 id="addcert"><a class="anchor" href="#addcert"></a>Create a Custom Certificate in Openshift</h2>
+<h2 id="05-sds"><a class="anchor" href="#05-sds"></a>Secure Gateways with SDS</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>It is time to create a new secret in Openshift to save the respective certificate files. Please, create this new <strong>secret</strong> executing the following command:</p>
+<p>As you know, Gateway describes a load balancer operating at the edge of the mesh receiving incoming or outgoing HTTP/TCP connections.</p>
+</div>
+<div class="paragraph">
+<p>During this step, you will review how to expose a secure HTTPS service through Openshift Router using a Gateway, a custom certificate and Istio Secret Discovery Service (SDS).</p>
+</div>
+<div class="sect2">
+<h3 id="05-sds-addcert"><a class="anchor" href="#05-sds-addcert"></a>Create in Istio the Custom Certificate using SDS</h3>
+<div class="paragraph">
+<p>In order to configure a new certificate in SDS, it is required to create a new <em>secret</em> in Openshift to save the respective files.</p>
+</div>
+<div class="paragraph">
+<p>Please, create this new <strong>secret</strong> executing the following command:</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc create -n istio-system secret tls &lt;user_namespace&gt;-credential --key=./03-jump-app-flows/front.jumpapp.com.key --cert=./03-jump-app-flows/front.jumpapp.com.crt</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc create -n istio-system secret tls &lt;user_namespace&gt;-credential --key=./05-secure-ingress-traffic-troubleshooting/front.jumpapp.com.key --cert=./05-secure-ingress-traffic-troubleshooting/front.jumpapp.com.crt</code></pre>
 </div>
 </div>
 <div class="imageblock">
@@ -287,26 +298,347 @@
 <div class="title">Figure 1. Secret Created</div>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_modify_golang_route_in_istio_system_namespace"><a class="anchor" href="#_modify_golang_route_in_istio_system_namespace"></a>Modify Golang Route in istio-system Namespace</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="05-sds-route"><a class="anchor" href="#05-sds-route"></a>Modify back-golang Route in istio-system Namespace</h3>
 <div class="paragraph">
-<p>Once "regular" routes are deleted, it is required to create the new ones.</p>
+<p>Once the new <em>secret</em> has been created, it is time to modify the back-golang OCP route in order to configure it as a <em>passthrough</em> route. With passthrough termination, encrypted traffic is sent straight to the <em>Ingress Gateway</em> without the router providing TLS termination. Therefore no key or certificate is required.</p>
 </div>
 <div class="paragraph">
-<p>Please, create new <strong>routes</strong> in <strong>istio-system</strong> namespace through the respective Openshift template executing the following command:</p>
+<p>Please, modify back-golang OCP route in <strong>istio-system</strong> namespace through the respective Openshift template executing the following command:</p>
 </div>
 <div class="listingblock lines_space console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 03-jump-app-flows/04-jump-app-routes.yaml --param-file=params.env --ignore-unknown-parameters | oc create -f - -n istio-system</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 05-secure-ingress-traffic-troubleshooting/00-jump-app-golang-route.yaml --param-file=params.env --ignore-unknown-parameters | oc apply -f - -n istio-system</code></pre>
 </div>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/jump-app-routes-mesh-ok.png" alt="jump app routes mesh ok">
+<img src="_images/jump-app-routes-sds-mod.png" alt="jump app routes sds mod">
 </div>
-<div class="title">Figure 2. Mesh Routes Created</div>
+<div class="title">Figure 2. back-golang Route Modified</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="05-sds-gw"><a class="anchor" href="#05-sds-gw"></a>Configure Gateway</h3>
+<div class="paragraph">
+<p>If you remember, a gateway describes a load balancer operating at the edge of the mesh receiving incoming or outgoing HTTP/TCP connections.</p>
+</div>
+<div class="paragraph">
+<p>In order to serve this new certificate when you are accessing to <em>Jump App</em> back-golang service, it is required to modify the respective Gateway.</p>
+</div>
+<div class="paragraph">
+<p>Please, modify existing frontend <strong>gateway</strong> object executing the following command:</p>
+</div>
+<div class="listingblock lines_space console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 05-secure-ingress-traffic-troubleshooting/01-jump-app-golang-gw.yaml --param-file=params.env --ignore-unknown-parameters | oc apply -f - -n &lt;user_namespace&gt;</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-gw-ok.png" alt="jump app gw ok">
+</div>
+<div class="title">Figure 3. back-golang Gateway Modified</div>
+</div>
+<div class="paragraph">
+<p>In order to ensure the Istio Secret Discovery Service (SDS) has been configured properly, you can review the <em>istio ingress gateway</em> pod as shown the following picture:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-sds-ok.png" alt="jump app sds ok">
+</div>
+<div class="title">Figure 4. Secret Added to SDS</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="05-test"><a class="anchor" href="#05-test"></a>Confirm <em>Jump App</em> is running</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Once <em>Jump App</em> SDS has been modified, it is required to follow the next steps in order to ensure your demo app is running properly:</p>
+</div>
+<div class="paragraph">
+<p>Please, execute the following steps in order to review your demo app current state after the customization:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Get pods</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get pods</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-pods-2-ok.png" alt="jump app pods 2 ok">
+</div>
+<div class="title">Figure 5. Jump App Pods Mesh</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Obtain external services URLs</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get routes -n istio-system | grep &lt;user_namespace&gt;</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-get-routes-mesh-ok.png" alt="jump app get routes mesh ok">
+</div>
+<div class="title">Figure 6. Jump App Routes</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Visit the <strong>back</strong>, <em>back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;</em>, route via your web browser</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-unavailable-back-route.png" alt="jump app unavailable back route">
+</div>
+<div class="title">Figure 7. Jump App Back Unavailable</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Visit the <strong>front</strong>, <em>front-javascript-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;</em>, route via your web browser.In addition, configure <strong>[ 1 ]</strong> retries with <strong>[ 1 ]</strong> interval and press <strong>[ JUMP ]</strong> and ensure the following message is displaying in your screen</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-unavailable-front.png" alt="jump app unavailable front">
+</div>
+<div class="title">Figure 8. Jump App Front with Errors</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+An error message appears when the frontend tries to call backend services
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="05-router"><a class="anchor" href="#05-router"></a>Openshift Router &#8594; Ingress Gateway Secure Connectivity</h2>
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-ingress-router-gw-sec.png" alt="jump app ingress router gw sec">
+</div>
+</div>
+<div class="sect2">
+<h3 id="04-trou-con"><a class="anchor" href="#04-trou-con"></a><strong>Test connectivity via command line</strong></h3>
+<div class="paragraph">
+<p>In order to verify the secure connectivity from the <em>OCP Routers</em> to the <em>Ingress Gateway</em>, it is required to follow the next steps:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Get pods in routes namespace</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get pods -n openshift-ingress</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/ocp-routers-pods.png" alt="ocp routers pods">
+</div>
+<div class="title">Figure 9. OCP Router Pods</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Connect to the router pod</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project openshift-ingress
+oc rsh &lt;router_pod_id&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Execute a HTTP request using curl command</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">curl --connect-to back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;:443:istio-ingressgateway.istio-system.svc.cluster.local:443 <a href="https://back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;/" class="bare">https://back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;/</a> -k -v</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-trou-05-gw.png" alt="jump app trou 05 gw">
+</div>
+<div class="title">Figure 10. HTTP Response 200</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Note that the <em>Ingress Gateway</em> is exposing back-golang service properly. For this reason, you can conclude the problem is located at the OCP route level
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="05-trou-fix"><a class="anchor" href="#05-trou-fix"></a><strong>Fix configuration problems</strong></h3>
+<div class="paragraph">
+<p>After test the connectivity from the <em>OCP routers</em> to the <em>ingress gateway</em>, you should review the <em>Route</em> object configuration in order to verify its definition. Please, visit the OCP console <strong>&lt;ocp_cluster_console&gt;</strong> and review this object current state:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-ocp-trou-05.png" alt="jump app ocp trou 05">
+</div>
+<div class="title">Figure 11. OCP Console</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-ocp-trou-05-error.png" alt="jump app ocp trou 05 error">
+</div>
+<div class="title">Figure 12. OCP Console Bad Configuration</div>
+</div>
+<div class="paragraph">
+<p>If you take a look at the <em>target port</em> closely, you can find <em>http2</em>. In order to support passthrough routes and connect with <em>Ingress Gateway</em> secure ports, it is required define a secured port. Please, <em>edit route</em>, define <em>https</em> as target port and click on <strong>[ SAVE ]</strong>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="04-test"><a class="anchor" href="#04-test"></a>Confirm <em>Jump App</em> is running again</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Once <em>Jump App</em> objects have been modified and fixed in Kiali and Openshift, it is required to follow the next steps in order to ensure your demo app is running properly:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Get pods</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get pods</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-pods-2-ok.png" alt="jump app pods 2 ok">
+</div>
+<div class="title">Figure 13. Jump App Pods Mesh</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Obtain external services URLs</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get routes -n istio-system | grep &lt;user_namespace&gt;</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-get-routes-mesh-ok.png" alt="jump app get routes mesh ok">
+</div>
+<div class="title">Figure 14. Jump App Routes</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Visit the <strong>back</strong>, <em>back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;</em>, route via your web browser</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-back-ok.png" alt="jump app back ok">
+</div>
+<div class="title">Figure 15. Jump App Back</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Visit the <strong>front</strong>, <em>front-javascript-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;</em>, route via your web browser. In addition, configure <strong>[ 1000 ]</strong> retries with <strong>[ 1 ]</strong> interval and press <strong>[ JUMP ]</strong> and ensure the following message is displaying in your screen</p>
+<div class="literalblock">
+<div class="content">
+<pre>...{"code":200,"message":"/jump - Greetings from Python!"}</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-front-jumps-ok.png" alt="jump app front jumps ok">
+</div>
+<div class="title">Figure 16. Jump App Front Web UI Multi Jumps</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+It is required to accept <strong>self-signed certificates</strong> provided by Openshift
+</td>
+</tr>
+</table>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/certs_warning.png" alt="certs warning" width="50%">
+</div>
+<div class="title">Figure 17. Openshift Self-signed Certificates Warning</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="04-kiali"><a class="anchor" href="#04-kiali"></a>Visit Kiali</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>At this time, <em>Jump App</em> is generating traffic flow thanks to the frontend where it was given an specific number of continuous jumps. In order to review the Service Mesh traffic flow in your project, please visit the Kiali console <strong>&lt;kiali_url&gt;</strong>:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-kiali.png" alt="jump app kiali">
+</div>
+<div class="title">Figure 18. Kiali Console</div>
 </div>
 </div>
 </div>
