@@ -60,7 +60,7 @@ In order to ensure the Istio Secret Discovery Service (SDS) has been configured 
 .Secret Added to SDS
 image::jump-app-sds-ok.png[]
 
-[#05-test]
+[#05-test-fail]
 == Confirm _Jump App_ is running
 
 Once _Jump App_ SDS has been modified, it is required to follow the next steps in order to ensure your demo app is running properly:
@@ -71,13 +71,12 @@ Please, execute the following steps in order to review your demo app current sta
 
 include::partial$check_jumpapp_mesh_fail.adoc[]
 
-
 [#05-router]
 == Openshift Router -> Ingress Gateway Secure Connectivity
 
 image::jump-app-ingress-router-gw-sec.png[]
 
-[#04-trou-con]
+[#05-trou-con]
 === *Test connectivity via command line*
 
 In order to verify the secure connectivity from the _OCP Routers_ to the _Ingress Gateway_, it is required to follow the next steps:
@@ -131,7 +130,122 @@ image::jump-app-ocp-trou-05-error.png[]
 
 If you take a look at the _target port_ closely, you can find _http2_. In order to support passthrough routes and connect with _Ingress Gateway_ secure ports, it is required define a secured port. Please, _edit route_, define _https_ as target port and click on *[ SAVE ]*.
 
-[#04-test]
+[#05-gateway]
+== Ingress Gateway -> Envoy Sidecar Secure Connectivity
+
+image::jump-app-ingress-envoy-gw-sec.png[]
+
+[#05-trou-gateway-forcessl]
+=== *Force mTLS in your namespace*
+
+In Istio, _PeerAuthentication_ defines how traffic will be tunneled (or not) to the sidecar. In order to force all connections are secured, it is required to create the following objects using the next command:
+
+:file: 05-secure-ingress-traffic-troubleshooting/02-jump-app-sec-services.yaml
+:namespace: <user_namespace>
+
+include::partial$oc_process_apply.adoc[]
+
+.PeerAuthentication and Destination Rule created
+image::jump-app-trou-05-padr.png[]
+
+
+[#05-trou-gateway-con]
+=== *Test connectivity via command line*
+
+In order to verify the secure connectivity from the _OCP Routers_ to the _Ingress Gateway_, it is required to follow the next steps:
+
+* Get pods in _istio-system_ namespace
+
+[.lines_7]
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc get pods -n istio-system
+----
+
+.Istio ControlPlane Pods
+image::ocp-istio-controlplane-pods.png[]
+
+* Connect to the _Ingress Gateway_ pod
+
+[.lines_7]
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc project istio-system
+oc rsh <ingress_gateway_pod_id> 
+----
+
+* Execute a HTTP request using curl command
+
+[.lines_7]
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+curl --header "Host: back-golang-user1-namespace.apps.acidonpe.sandbox37.opentlc.com" back-golang.user1-namespace.svc.cluster.local:8442 -v
+----
+
+.HTTP Response _Connection reset by peer_
+image::jump-app-trou-05-k8ssrv.png[]
+
+NOTE: You are receiving *curl: (56) Recv failure: Connection reset by peer* because _PeerAuthentication STRICT_ mode is enabled
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+[#05-trou-gateway-evoy-con]
+=== *Emulate Envoy Proxy connectivity via command line*
+
+
+[.lines_7]
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc project <istio-system>
+oc get pod
+oc exec <ingressgateway_pod_id> curl localhost:15000/config_dump > ingress.json
+
+
+cat <<EOF > openssl.conf
+[req]
+default_bits = 2048
+encrypt_key  = no # Change to encrypt the private key using des3 or similar
+default_md   = sha256
+prompt       = no
+utf8         = yes
+req_extensions = v3_req
+distinguished_name = req_distinguished_name
+
+[req_distinguished_name]
+
+[v3_req]
+basicConstraints     = CA:FALSE
+keyUsage             = digitalSignature, keyEncipherment
+extendedKeyUsage     = clientAuth, serverAuth
+subjectAltName       = @alt_names
+
+[alt_names]
+URI = spiffe://cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account
+EOF
+
+oc extract secret/istio-ca-secret --to=. -n istio-system
+openssl req -out istio.test.csr -newkey rsa:2048 -nodes -keyout istio.test.key -subj "/"
+openssl x509 -req -days 365 -CA ca-cert.pem -CAkey ca-key.pem -CAcreateserial -in istio.test.csr -out  istio.test.crt -extensions v3_req -extfile openssl.conf
+
+oc project istio-system
+oc rsh istio-ingressgateway-cfdfb66ff-952hx
+
+cd /tmp
+vi istio.test.crt
+vi istio.test.key
+vi ca-cert.pem
+
+curl --connect-to back-golang-user1-<user_namespace>.<openshift_apps_domain>:443:back-golang.user1-namespace.svc.cluster.local:8442 https://back-golang-<user_namespace>.<openshift_apps_domain>/ -k -v --cacert ca-cert.pem --cert istio.test.crt --key istio.test.key
+
+----
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+[#05-test]
 == Confirm _Jump App_ is running again
 
 Once _Jump App_ objects have been modified and fixed in Kiali and Openshift, it is required to follow the next steps in order to ensure your demo app is running properly:
@@ -142,7 +256,7 @@ Once _Jump App_ objects have been modified and fixed in Kiali and Openshift, it 
 include::partial$check_jumpapp_mesh.adoc[]
 
 
-[#04-kiali]
+[#05-kiali]
 == Visit Kiali
 
 At this time, _Jump App_ is generating traffic flow thanks to the frontend where it was given an specific number of continuous jumps. In order to review the Service Mesh traffic flow in your project, please visit the Kiali console *<kiali_url>*:

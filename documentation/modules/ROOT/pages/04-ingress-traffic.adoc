@@ -291,7 +291,7 @@ oc get pods -n istio-system
 ----
 
 .Istio ControlPlane Pods
-image::ocp-routers-pods.png[]
+image::ocp-istio-controlplane-pods.png[]
 
 * Connect to the _Ingress Gateway_ pod
 
