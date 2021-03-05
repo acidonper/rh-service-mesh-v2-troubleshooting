@@ -49,3 +49,9 @@ In this phase, you will customize _Jump App_ and resolve any problem found durin
 xref:04-ingress-traffic.adoc[Start this exercise...]
 
 
+=== Secure Ingress Traffic Troubleshooting
+
+In this phase, you will understand how connectivity security is implemented in Istio regarding mTLS "intra-mesh" connections and expose HTTPS services from a custom certificate in the _Ingress Gateway_, resolving any problem found during this customization process.
+
+xref:05-secure-ingress-traffic[Start this exercise...]
+
