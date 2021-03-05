@@ -222,7 +222,64 @@
 </ul>
   </li>
   <li class="nav-item is-current-page" data-depth="1">
+    <button class="nav-item-toggle"></button>
     <a class="nav-link" href="05-secure-ingress-traffic.html">5. Secure Ingress Traffic Troubleshooting</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="#05-sds">5.1 Secure Gateways with SDS</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#05-sds-addcert">5.1.1 Create in Istio the Custom Certificate using SDS</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#05-sds-route">5.1.2 Modify back-golang Route in istio-system Namespace</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#05-sds-gw">5.1.3 Configure Gateway</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#05-test-fail">5.2 Confirm <em>Jump App</em> is running</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="#05-router">5.3 Openshift Router &#8594; Ingress Gateway Secure Connectivity</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#05-trou-con">5.3.1 Test connectivity via command line</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#05-trou-fix">5.3.2 Fix configuration problems</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#05-trou-fix">5.3.3 Fix configuration problems</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="#05-gateway">5.4 Ingress Gateway &#8594; Envoy Sidecar Secure Connectivity</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#05-trou-gateway-forcessl">5.4.1 Force mTLS in your namespace</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#05-trou-gateway-con">5.4.2 Test connectivity via command line</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#05-trou-gateway-evoy-con">5.4.3 Emulate regular <em>Ingress Gateway</em> connectivity via command line</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#05-test">5.5 Confirm <em>Jump App</em> is running again</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#05-kiali">5.5 Visit Kiali</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="06-egress-traffic.html">6. Egress Traffic Troubleshooting</a>
@@ -563,7 +620,7 @@ Note that the <em>Ingress Gateway</em> is exposing back-golang service properly.
 <div class="sect2">
 <h3 id="05-trou-gateway-con"><a class="anchor" href="#05-trou-gateway-con"></a><strong>Test connectivity via command line</strong></h3>
 <div class="paragraph">
-<p>In order to verify the secure connectivity from the <em>OCP Routers</em> to the <em>Ingress Gateway</em>, it is required to follow the next steps:</p>
+<p>In order to verify the secure connectivity from the <em>Ingress Gateway</em> to the <em>Envoy Sidecar</em>, it is required to follow the next steps:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -605,7 +662,7 @@ oc rsh &lt;ingress_gateway_pod_id&gt;</code></pre>
 </div>
 <div class="listingblock lines_7 console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">curl --header "Host: back-golang-user1-namespace.apps.acidonpe.sandbox37.opentlc.com" back-golang.user1-namespace.svc.cluster.local:8442 -v</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">curl --header "Host: back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;" back-golang.&lt;user_namespace&gt;.svc.cluster.local:8442 -v</code></pre>
 </div>
 </div>
 <div class="imageblock">
@@ -626,20 +683,44 @@ You are receiving <strong>curl: (56) Recv failure: Connection reset by peer</str
 </tr>
 </table>
 </div>
-<div class="paragraph">
-<p>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
-</div>
 </div>
 <div class="sect2">
-<h3 id="05-trou-gateway-evoy-con"><a class="anchor" href="#05-trou-gateway-evoy-con"></a><strong>Emulate Envoy Proxy connectivity via command line</strong></h3>
+<h3 id="05-trou-gateway-evoy-con"><a class="anchor" href="#05-trou-gateway-evoy-con"></a><strong>Emulate regular <em>Ingress Gateway</em> connectivity via command line</strong></h3>
+<div class="paragraph">
+<p>At this point, it is time to understand how Service Mesh generates envoy traffic internal certificates. In this step, you should be able to generate a certificate from the Istio CA in order to stablish a mTLS secure connection from the <em>Ingress Gateway</em> to the <em>Envoy Sidecar</em>, back-golang.</p>
+</div>
+<div class="paragraph">
+<p>Please, execute the following steps in order to perform the previous tasks:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Extract Istio CA certificates</p>
+</li>
+</ul>
+</div>
 <div class="listingblock lines_7 console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project &lt;istio-system&gt;
-oc get pod
-oc exec &lt;ingressgateway_pod_id&gt; curl localhost:15000/config_dump &gt; ingress.json
-
-
-cat &lt;&lt;EOF &gt; openssl.conf
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project istio-system
+oc extract secret/istio-ca-secret --to=. -n istio-system</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/ocp-istio-ca-certs.png" alt="ocp istio ca certs">
+</div>
+<div class="title">Figure 16. Istio CA Certs</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Generate a openssl configuration file in order to be able to generate a x509v3 certificate</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">cat &lt;&lt;EOF &gt; openssl.conf
 [req]
 default_bits = 2048
 encrypt_key  = no # Change to encrypt the private key using des3 or similar
@@ -648,36 +729,135 @@ prompt       = no
 utf8         = yes
 req_extensions = v3_req
 distinguished_name = req_distinguished_name
-
 [req_distinguished_name]
-
 [v3_req]
 basicConstraints     = CA:FALSE
 keyUsage             = digitalSignature, keyEncipherment
 extendedKeyUsage     = clientAuth, serverAuth
 subjectAltName       = @alt_names
-
 [alt_names]
 URI = spiffe://cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account
-EOF
-
-oc extract secret/istio-ca-secret --to=. -n istio-system
-openssl req -out istio.test.csr -newkey rsa:2048 -nodes -keyout istio.test.key -subj "/"
-openssl x509 -req -days 365 -CA ca-cert.pem -CAkey ca-key.pem -CAcreateserial -in istio.test.csr -out  istio.test.crt -extensions v3_req -extfile openssl.conf
-
-oc project istio-system
-oc rsh istio-ingressgateway-cfdfb66ff-952hx
-
-cd /tmp
+EOF</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Generate a certificate request</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">openssl req -out istio.test.csr -newkey rsa:2048 -nodes -keyout istio.test.key -subj "/"</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/ocp-istio-gen-cert-req.png" alt="ocp istio gen cert req">
+</div>
+<div class="title">Figure 17. New Certificate Request</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Generate a certificate using these CA certificates</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">openssl x509 -req -days 365 -CA ca-cert.pem -CAkey ca-key.pem -CAcreateserial -in istio.test.csr -out  istio.test.crt -extensions v3_req -extfile openssl.conf</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/ocp-istio-gen-cert.png" alt="ocp istio gen cert">
+</div>
+<div class="title">Figure 18. New Istio CA signed Certificate</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Get pods in <em>istio-system</em> namespace</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get pods -n istio-system</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/ocp-istio-controlplane-pods.png" alt="ocp istio controlplane pods">
+</div>
+<div class="title">Figure 19. Istio ControlPlane Pods</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Connect to the <em>Ingress Gateway</em> pod</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project istio-system
+oc rsh &lt;ingress_gateway_pod_id&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Create certificates manually in the <em>Ingress Gateway</em></p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">mkdir /tmp/&lt;user_namespace&gt;
+cd /tmp/&lt;user_namespace&gt;
 vi istio.test.crt
 vi istio.test.key
-vi ca-cert.pem
-
-curl --connect-to back-golang-user1-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;:443:back-golang.user1-namespace.svc.cluster.local:8442 <a href="https://back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;/" class="bare">https://back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;/</a> -k -v --cacert ca-cert.pem --cert istio.test.crt --key istio.test.key</code></pre>
+vi ca-cert.pem</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Perform a HTTP request to the k8s service <em>back-golang</em> using curl command</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">curl --connect-to back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;:443:back-golang.&lt;user_namespace&gt;.svc.cluster.local:8442 <a href="https://back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;/" class="bare">https://back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;/</a> -k -v</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-trou-05-k8ssrv-cert.png" alt="jump app trou 05 k8ssrv cert">
+</div>
+<div class="title">Figure 20. HTTP Response <em>Certificate required</em></div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Once again, perform a HTTP request to the k8s service <em>back-golang</em> using previous certificates in this time</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">curl --connect-to back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;:443:back-golang.&lt;user_namespace&gt;.svc.cluster.local:8442 <a href="https://back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;/" class="bare">https://back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;/</a> -k -v --cacert ca-cert.pem --cert istio.test.crt --key istio.test.key</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-trou-05-k8ssrv-cert-ok.png" alt="jump app trou 05 k8ssrv cert ok">
+</div>
+<div class="title">Figure 21. HTTP Response 200</div>
 </div>
 </div>
 </div>
@@ -704,7 +884,7 @@ curl --connect-to back-golang-user1-&lt;user_namespace&gt;.&lt;openshift_apps_do
 <div class="content">
 <img src="_images/jump-app-pods-2-ok.png" alt="jump app pods 2 ok">
 </div>
-<div class="title">Figure 16. Jump App Pods Mesh</div>
+<div class="title">Figure 22. Jump App Pods Mesh</div>
 </div>
 <div class="ulist">
 <ul>
@@ -722,7 +902,7 @@ curl --connect-to back-golang-user1-&lt;user_namespace&gt;.&lt;openshift_apps_do
 <div class="content">
 <img src="_images/jump-app-get-routes-mesh-ok.png" alt="jump app get routes mesh ok">
 </div>
-<div class="title">Figure 17. Jump App Routes</div>
+<div class="title">Figure 23. Jump App Routes</div>
 </div>
 <div class="ulist">
 <ul>
@@ -735,7 +915,7 @@ curl --connect-to back-golang-user1-&lt;user_namespace&gt;.&lt;openshift_apps_do
 <div class="content">
 <img src="_images/jump-app-back-ok.png" alt="jump app back ok">
 </div>
-<div class="title">Figure 18. Jump App Back</div>
+<div class="title">Figure 24. Jump App Back</div>
 </div>
 <div class="ulist">
 <ul>
@@ -753,7 +933,7 @@ curl --connect-to back-golang-user1-&lt;user_namespace&gt;.&lt;openshift_apps_do
 <div class="content">
 <img src="_images/jump-app-front-jumps-ok.png" alt="jump app front jumps ok">
 </div>
-<div class="title">Figure 19. Jump App Front Web UI Multi Jumps</div>
+<div class="title">Figure 25. Jump App Front Web UI Multi Jumps</div>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -771,7 +951,7 @@ It is required to accept <strong>self-signed certificates</strong> provided by O
 <div class="content">
 <img src="_images/certs_warning.png" alt="certs warning" width="50%">
 </div>
-<div class="title">Figure 20. Openshift Self-signed Certificates Warning</div>
+<div class="title">Figure 26. Openshift Self-signed Certificates Warning</div>
 </div>
 </div>
 </div>
@@ -785,7 +965,7 @@ It is required to accept <strong>self-signed certificates</strong> provided by O
 <div class="content">
 <img src="_images/jump-app-kiali.png" alt="jump app kiali">
 </div>
-<div class="title">Figure 21. Kiali Console</div>
+<div class="title">Figure 27. Kiali Console</div>
 </div>
 </div>
 </div>

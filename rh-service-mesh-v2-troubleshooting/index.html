@@ -221,7 +221,64 @@
 </ul>
   </li>
   <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
     <a class="nav-link" href="05-secure-ingress-traffic.html">5. Secure Ingress Traffic Troubleshooting</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="05-secure-ingress-traffic.html#05-sds">5.1 Secure Gateways with SDS</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-secure-ingress-traffic.html#05-sds-addcert">5.1.1 Create in Istio the Custom Certificate using SDS</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-secure-ingress-traffic.html#05-sds-route">5.1.2 Modify back-golang Route in istio-system Namespace</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-secure-ingress-traffic.html#05-sds-gw">5.1.3 Configure Gateway</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="05-secure-ingress-traffic.html#05-test-fail">5.2 Confirm <em>Jump App</em> is running</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="05-secure-ingress-traffic.html#05-router">5.3 Openshift Router &#8594; Ingress Gateway Secure Connectivity</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-secure-ingress-traffic.html#05-trou-con">5.3.1 Test connectivity via command line</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-secure-ingress-traffic.html#05-trou-fix">5.3.2 Fix configuration problems</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-secure-ingress-traffic.html#05-trou-fix">5.3.3 Fix configuration problems</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="05-secure-ingress-traffic.html#05-gateway">5.4 Ingress Gateway &#8594; Envoy Sidecar Secure Connectivity</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-secure-ingress-traffic.html#05-trou-gateway-forcessl">5.4.1 Force mTLS in your namespace</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-secure-ingress-traffic.html#05-trou-gateway-con">5.4.2 Test connectivity via command line</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-secure-ingress-traffic.html#05-trou-gateway-evoy-con">5.4.3 Emulate regular <em>Ingress Gateway</em> connectivity via command line</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="05-secure-ingress-traffic.html#05-test">5.5 Confirm <em>Jump App</em> is running again</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="05-secure-ingress-traffic.html#05-kiali">5.5 Visit Kiali</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="06-egress-traffic.html">6. Egress Traffic Troubleshooting</a>
@@ -346,6 +403,15 @@
 </div>
 <div class="paragraph">
 <p><a href="04-ingress-traffic.html" class="page">Start this exercise&#8230;&#8203;</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3>Secure Ingress Traffic Troubleshooting</h3>
+<div class="paragraph">
+<p>In this phase, you will understand how connectivity security is implemented in Istio regarding mTLS "intra-mesh" connections and expose HTTPS services from a custom certificate in the <em>Ingress Gateway</em>, resolving any problem found during this customization process.</p>
+</div>
+<div class="paragraph">
+<p><a href="#05-secure-ingress-traffic">Start this exercise&#8230;&#8203;</a></p>
 </div>
 </div>
 </div>
