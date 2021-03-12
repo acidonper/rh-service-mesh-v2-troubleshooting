@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Untitled :: Red Hat Service Mesh - Troubleshooting</title>
+    <title>Service Mesh Secure Egress Traffic Flow :: Red Hat Service Mesh - Troubleshooting</title>
     <link rel="canonical" href="http://localhost:3000/rhs-build-course/index.html/rh-service-mesh-v2-troubleshooting/06-egress-traffic.html">
     <link rel="prev" href="05-secure-ingress-traffic.html">
     <link rel="next" href="07-tools.html">
@@ -325,8 +325,382 @@
   </div>
   <div class="content">
 <article class="doc">
+<h1 class="page">Service Mesh Secure Egress Traffic Flow</h1>
+<div class="sect1">
+<h2 id="06-sds"><a class="anchor" href="#06-sds"></a>Secure Egress Traffic with mTLS</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>Solucionar salida</p>
+<p>As you know, Gateway describes a load balancer operating at the edge of the mesh receiving incoming or outgoing HTTP/TCP connections.</p>
+</div>
+<div class="paragraph">
+<p>During this step, you will review how to work with a secure HTTPS service through Egress Gateway and a custom certificate.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="06-addcert"><a class="anchor" href="#06-addcert"></a>Create in Istio the Custom Certificate</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Create secret to hold the server certificates</p>
+</li>
+</ul>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc create -n &lt;user_namespace&gt;-mesh-external secret tls nginx-server-certs --key ./06-secure-egress-traffic-troubleshooting/3_application/private/nginx.example.com.key.pem --cert 06-secure-egress-traffic-troubleshooting/3_application/certs/nginx.example.com.cert.pem</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-mesh-external-svc-cert-ok.png" alt="jump app mesh external svc cert ok">
+</div>
+<div class="title">Figure 1. Server certificates OK</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Create secret to hold the CA certificates</p>
+</li>
+</ul>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc create -n &lt;user_namespace&gt;-mesh-external secret generic nginx-ca-certs --from-file=06-secure-egress-traffic-troubleshooting/2_intermediate/certs/ca-chain.cert.pem</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-mesh-external-ca-cert-ok.png" alt="jump app mesh external ca cert ok">
+</div>
+<div class="title">Figure 2. CA certificates OK</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="06-createnginx"><a class="anchor" href="#06-createnginx"></a>Create Nginx service</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Create <em>nginx.conf</em> file in a configmap</p>
+</li>
+</ul>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc create configmap nginx-configmap -n &lt;user_namespace&gt;-mesh-external --from-file=nginx.conf=./06-secure-egress-traffic-troubleshooting/nginx.conf</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-mesh-external-nginx-conf-ok.png" alt="jump app mesh external nginx conf ok">
+</div>
+<div class="title">Figure 3. Nginx config file OK</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Deploy the Nginx server</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_space console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 06-secure-egress-traffic-troubleshooting/00-nginx-svc-pod.yml --param-file=params.env --ignore-unknown-parameters | oc apply -f - -n &lt;user_namespace&gt;-mesh-external</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-mesh-external-nginx-deployment-ok.png" alt="jump app mesh external nginx deployment ok">
+</div>
+<div class="title">Figure 4. Nginx deployment and service ok</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Check if the nginx pod is ready</p>
+</li>
+</ul>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get pods -n &lt;user_namespace&gt;-mesh-external</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-mesh-external-nginx-pods-ok.png" alt="jump app mesh external nginx pods ok">
+</div>
+<div class="title">Figure 5. Nginx pod ok</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Check if the nginx service is ready</p>
+</li>
+</ul>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc -n &lt;user_namespace&gt;-mesh-external rsh &lt;nginx_pod_id&gt;  curl localhost:443 -k</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-mesh-external-nginx-svc-ok-404.png" alt="jump app mesh external nginx svc ok 404">
+</div>
+<div class="title">Figure 6. Nginx service mTLS ERROR</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+You have deployed a mTLS service and you are receiving a <em>400 Bad Request</em> error because of not using certificates to access to this service
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="06-createsevs"><a class="anchor" href="#06-createsevs"></a>Configure Nginx service Istio Objects</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Create a <em>ServiceEntry</em> and a <em>VirtualService</em> in your namespace</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_space console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 06-secure-egress-traffic-troubleshooting/01-jump-app-nginx-vs-se.yaml --param-file=params.env --ignore-unknown-parameters | oc apply -f - -n &lt;user_namespace&gt;</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-mesh-external-nginx-access-objects.png" alt="jump app mesh external nginx access objects">
+</div>
+<div class="title">Figure 7. Nginx ServiceEntry and VirtualService ok</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="06-createtesting"><a class="anchor" href="#06-createtesting"></a>Create a Testing Microservice</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Create Kubernetes Secrets to hold the client’s certificates</p>
+</li>
+</ul>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc create -n &lt;user_namespace&gt; secret tls nginx-client-certs --key 06-secure-egress-traffic-troubleshooting/4_client/private/nginx.example.com.key.pem --cert 06-secure-egress-traffic-troubleshooting/4_client/certs/nginx.example.com.cert.pem</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-mesh-external-nginx-access-certs.png" alt="jump app mesh external nginx access certs">
+</div>
+<div class="title">Figure 8. Client certificates OK</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Create Kubernetes Secrets to hold the CA certificates</p>
+</li>
+</ul>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc create -n &lt;user_namespace&gt; secret generic nginx-ca-certs --from-file=06-secure-egress-traffic-troubleshooting/2_intermediate/certs/ca-chain.cert.pem</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-mesh-external-nginx-access-ca-certs.png" alt="jump app mesh external nginx access ca certs">
+</div>
+<div class="title">Figure 9. CA certificates OK</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Create testing <em>Service</em> and <em>Deployment</em></p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_space console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 06-secure-egress-traffic-troubleshooting/02-jump-app-sleep-svc-pod.yaml --param-file=params.env --ignore-unknown-parameters | oc apply -f - -n &lt;user_namespace&gt;</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-mesh-external-nginx-client-pod.png" alt="jump app mesh external nginx client pod">
+</div>
+<div class="title">Figure 10. Testing service created</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Test service pod is runnign</p>
+</li>
+</ul>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get pods -n &lt;user_namespace&gt;</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-mesh-external-nginx-client-pod-ok.png" alt="jump app mesh external nginx client pod ok">
+</div>
+<div class="title">Figure 11. Testing service pod OK</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Test nginx service via testing pod</p>
+</li>
+</ul>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc -n &lt;user_namespace&gt; exec -it &lt;testing_pod_id&gt; -c sleep -- curl -v --resolve nginx.example.com:443:1.1.1.1 --cacert /etc/nginx-ca-certs/ca-chain.cert.pem --cert /etc/nginx-client-certs/tls.crt --key /etc/nginx-client-certs/tls.key <a href="https://nginx.example.com" class="bare">https://nginx.example.com</a></code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-mesh-external-nginx-client-mtls-ok.png" alt="jump app mesh external nginx client mtls ok">
+</div>
+<div class="title">Figure 12. Nginx service with mTLS</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The IP value passed in the --resolve option (1.1.1.1 below) is not significant, any value other than 127.0.0.1 can be used
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Verify that the server requires the client’s certificate</p>
+</li>
+</ul>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc -n &lt;user_namespace&gt; exec -it &lt;testing_pod_id&gt; -c sleep -- curl -k --resolve nginx.example.com:443:1.1.1.1 <a href="https://nginx.example.com" class="bare">https://nginx.example.com</a></code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-mesh-external-nginx-svc-ok-404.png" alt="jump app mesh external nginx svc ok 404">
+</div>
+<div class="title">Figure 13. Nginx service mTLS ERROR</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+You have deployed a nginx mTLS service and you are receiving a <em>400 Bad Request</em> error because of not using certificates to access to this service
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Clean the <em>ServiceEntry</em> and <em>VirtualService</em> in your namespace</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_space console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 06-secure-egress-traffic-troubleshooting/01-jump-app-nginx-vs-se.yaml --param-file=params.env --ignore-unknown-parameters | oc delete -f - -n &lt;user_namespace&gt;</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-mesh-external-nginx-access-objects-deleted.png" alt="jump app mesh external nginx access objects deleted">
+</div>
+<div class="title">Figure 14. Nginx ServiceEntry and VirtualService deleted</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="06-configureegressaccess"><a class="anchor" href="#06-configureegressaccess"></a>Configure mutual TLS origination for egress traffic</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Clean the <em>ServiceEntry</em> and <em>VirtualService</em> in your namespace</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_space console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 06-secure-egress-traffic-troubleshooting/01-jump-app-nginx-vs-se.yaml --param-file=params.env --ignore-unknown-parameters | oc delete -f - -n &lt;user_namespace&gt;</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-mesh-external-nginx-access-objects-deleted.png" alt="jump app mesh external nginx access objects deleted">
+</div>
+<div class="title">Figure 15. Nginx ServiceEntry and VirtualService deleted</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Create a <em>Gateway</em> for nginx.example.com, port 443, and <em>destination rules</em> and <em>virtual services</em> to direct the traffic through the egress gateway and from the egress gateway to the external service</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_space console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 06-secure-egress-traffic-troubleshooting/03-jump-app-egress-gw-dr.yaml --param-file=params.env --ignore-unknown-parameters | oc apply -f - -n &lt;user_namespace&gt;</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-mesh-external-nginx-access-egress-objects.png" alt="jump app mesh external nginx access egress objects">
+</div>
+<div class="title">Figure 16. Gateway, Virtual Service and Destination Rules OK</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Test nginx service through testing pod via egress gateway</p>
+</li>
+</ul>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc -n &lt;user_namespace&gt; exec -it &lt;testing_pod_id&gt; -c sleep -- curl -s --resolve nginx.example.com:80:1.1.1.1 <a href="http://nginx.example.com" class="bare">http://nginx.example.com</a></code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-mesh-external-nginx-access-egress-con-ok-mtls.png" alt="jump app mesh external nginx access egress con ok mtls">
+</div>
+<div class="title">Figure 17. nginx.example.com mTLS connection OK</div>
+</div>
+</div>
 </div>
 <nav class="pagination">
   <span class="prev"><a href="05-secure-ingress-traffic.html">5. Secure Ingress Traffic Troubleshooting</a></span>
