@@ -1,1 +1,210 @@
-Solucionar salida
+= Service Mesh Secure Egress Traffic Flow
+
+[#06-sds]
+== Secure Egress Traffic with mTLS
+
+As you know, Gateway describes a load balancer operating at the edge of the mesh receiving incoming or outgoing HTTP/TCP connections.
+
+During this step, you will review how to work with a secure HTTPS service through Egress Gateway and a custom certificate.
+
+[#06-addcert]
+== Create in Istio the Custom Certificate
+
+* Create secret to hold the server certificates
+
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc create -n <user_namespace>-mesh-external secret tls nginx-server-certs --key ./06-secure-egress-traffic-troubleshooting/3_application/private/nginx.example.com.key.pem --cert 06-secure-egress-traffic-troubleshooting/3_application/certs/nginx.example.com.cert.pem
+----
+
+.Server certificates OK
+image::jump-app-mesh-external-svc-cert-ok.png[]
+
+* Create secret to hold the CA certificates
+
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc create -n <user_namespace>-mesh-external secret generic nginx-ca-certs --from-file=06-secure-egress-traffic-troubleshooting/2_intermediate/certs/ca-chain.cert.pem
+----
+
+.CA certificates OK
+image::jump-app-mesh-external-ca-cert-ok.png[]
+
+[#06-createnginx]
+== Create Nginx service
+
+* Create _nginx.conf_ file in a configmap
+
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc create configmap nginx-configmap -n <user_namespace>-mesh-external --from-file=nginx.conf=./06-secure-egress-traffic-troubleshooting/nginx.conf
+----
+
+.Nginx config file OK
+image::jump-app-mesh-external-nginx-conf-ok.png[]
+
+* Deploy the Nginx server
+
+:file: 06-secure-egress-traffic-troubleshooting/00-nginx-svc-pod.yml
+:namespace: <user_namespace>-mesh-external
+
+include::partial$oc_process_apply.adoc[]
+
+.Nginx deployment and service ok
+image::jump-app-mesh-external-nginx-deployment-ok.png[]
+
+* Check if the nginx pod is ready
+
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc get pods -n <user_namespace>-mesh-external
+----
+
+.Nginx pod ok
+image::jump-app-mesh-external-nginx-pods-ok.png[]
+
+* Check if the nginx service is ready
+
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc -n <user_namespace>-mesh-external rsh <nginx_pod_id>  curl localhost:443 -k
+----
+
+.Nginx service mTLS ERROR 
+image::jump-app-mesh-external-nginx-svc-ok-404.png[]
+
+NOTE: You have deployed a mTLS service and you are receiving a _400 Bad Request_ error because of not using certificates to access to this service
+
+[#06-createsevs]
+=== Configure Nginx service Istio Objects
+
+* Create a _ServiceEntry_ and a _VirtualService_ in your namespace
+
+:file: 06-secure-egress-traffic-troubleshooting/01-jump-app-nginx-vs-se.yaml
+:namespace: <user_namespace>
+
+include::partial$oc_process_apply.adoc[]
+
+.Nginx ServiceEntry and VirtualService ok
+image::jump-app-mesh-external-nginx-access-objects.png[]
+
+[#06-createtesting]
+== Create a Testing Microservice
+
+* Create Kubernetes Secrets to hold the client’s certificates
+
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc create -n <user_namespace> secret tls nginx-client-certs --key 06-secure-egress-traffic-troubleshooting/4_client/private/nginx.example.com.key.pem --cert 06-secure-egress-traffic-troubleshooting/4_client/certs/nginx.example.com.cert.pem
+----
+
+.Client certificates OK
+image::jump-app-mesh-external-nginx-access-certs.png[]
+
+* Create Kubernetes Secrets to hold the CA certificates
+
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc create -n <user_namespace> secret generic nginx-ca-certs --from-file=06-secure-egress-traffic-troubleshooting/2_intermediate/certs/ca-chain.cert.pem
+----
+
+.CA certificates OK
+image::jump-app-mesh-external-nginx-access-ca-certs.png[]
+
+* Create testing _Service_ and _Deployment_
+
+:file: 06-secure-egress-traffic-troubleshooting/02-jump-app-sleep-svc-pod.yaml
+:namespace: <user_namespace>
+
+include::partial$oc_process_apply.adoc[]
+
+.Testing service created
+image::jump-app-mesh-external-nginx-client-pod.png[]
+
+* Test service pod is runnign
+
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc get pods -n <user_namespace>
+----
+
+.Testing service pod OK
+image::jump-app-mesh-external-nginx-client-pod-ok.png[]
+
+* Test nginx service via testing pod
+
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc -n <user_namespace> exec -it <testing_pod_id> -c sleep -- curl -v --resolve nginx.example.com:443:1.1.1.1 --cacert /etc/nginx-ca-certs/ca-chain.cert.pem --cert /etc/nginx-client-certs/tls.crt --key /etc/nginx-client-certs/tls.key https://nginx.example.com
+----
+
+.Nginx service with mTLS
+image::jump-app-mesh-external-nginx-client-mtls-ok.png[]
+
+NOTE: The IP value passed in the --resolve option (1.1.1.1 below) is not significant, any value other than 127.0.0.1 can be used
+
+* Verify that the server requires the client’s certificate
+
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc -n <user_namespace> exec -it <testing_pod_id> -c sleep -- curl -k --resolve nginx.example.com:443:1.1.1.1 https://nginx.example.com
+----
+
+.Nginx service mTLS ERROR 
+image::jump-app-mesh-external-nginx-svc-ok-404.png[]
+
+NOTE: You have deployed a nginx mTLS service and you are receiving a _400 Bad Request_ error because of not using certificates to access to this service
+
+* Clean the _ServiceEntry_ and _VirtualService_ in your namespace
+
+:file: 06-secure-egress-traffic-troubleshooting/01-jump-app-nginx-vs-se.yaml
+:namespace: <user_namespace>
+
+include::partial$oc_process_delete.adoc[]
+
+.Nginx ServiceEntry and VirtualService deleted
+image::jump-app-mesh-external-nginx-access-objects-deleted.png[]
+
+[#06-configureegressaccess]
+== Configure mutual TLS origination for egress traffic
+
+* Clean the _ServiceEntry_ and _VirtualService_ in your namespace
+
+:file: 06-secure-egress-traffic-troubleshooting/01-jump-app-nginx-vs-se.yaml
+:namespace: <user_namespace>
+
+include::partial$oc_process_delete.adoc[]
+
+.Nginx ServiceEntry and VirtualService deleted
+image::jump-app-mesh-external-nginx-access-objects-deleted.png[]
+
+* Create a _Gateway_ for nginx.example.com, port 443, and _destination rules_ and _virtual services_ to direct the traffic through the egress gateway and from the egress gateway to the external service
+
+:file: 06-secure-egress-traffic-troubleshooting/03-jump-app-egress-gw-dr.yaml
+:namespace: <user_namespace>
+
+include::partial$oc_process_apply.adoc[]
+
+.Gateway, Virtual Service and Destination Rules OK
+image::jump-app-mesh-external-nginx-access-egress-objects.png[]
+
+* Test nginx service through testing pod via egress gateway
+
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc -n <user_namespace> exec -it <testing_pod_id> -c sleep -- curl -s --resolve nginx.example.com:80:1.1.1.1 http://nginx.example.com
+----
+
+.nginx.example.com mTLS connection OK
+image::jump-app-mesh-external-nginx-access-egress-con-ok-mtls.png[]
