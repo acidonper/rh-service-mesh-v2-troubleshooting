@@ -31,7 +31,7 @@ image::jump-app-gws-ok.png[]
 [#vsvc]
 === Virtual Services
 
-Once gateways are created and the application is reacheabled, it is time to create the traffic rules inside your namespace in order to route this traffic to the specific endpoint.
+Once gateways are created and the application is reachable, it is time to create the traffic rules inside your namespace in order to route this traffic to the specific endpoint.
 
 Please, create new *virtual services* through the respective Openshift template executing the following command: 
 
