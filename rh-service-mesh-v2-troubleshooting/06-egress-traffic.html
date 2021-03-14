@@ -282,7 +282,37 @@
 </ul>
   </li>
   <li class="nav-item is-current-page" data-depth="1">
+    <button class="nav-item-toggle"></button>
     <a class="nav-link" href="06-egress-traffic.html">6. Egress Traffic Troubleshooting</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#06-sds">5.1 Secure Egress Traffic with mTLS</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#06-addcert">5.2 Create in Istio the Custom Certificate</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="#06-addcert">5.3 Create Nginx service</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#06-createsevs">5.3.1 Configure Nginx service Istio Objects</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#06-createtesting">5.4 Create the Testing Microservice</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="#06-configureegressaccess">5.5 Configure mutual TLS origination for egress traffic</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#06-configureegressaccesstest">5.5.1 Testing egress traffic</a>
+  </li>
+</ul>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="07-tools.html">7. Troubleshooting Tools</a>
@@ -489,7 +519,7 @@ You have deployed a mTLS service and you are receiving a <em>400 Bad Request</em
 </div>
 </div>
 <div class="sect1">
-<h2 id="06-createtesting"><a class="anchor" href="#06-createtesting"></a>Create a Testing Microservice</h2>
+<h2 id="06-createtesting"><a class="anchor" href="#06-createtesting"></a>Create the Testing Microservice</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
@@ -682,6 +712,8 @@ You have deployed a nginx mTLS service and you are receiving a <em>400 Bad Reque
 </div>
 <div class="title">Figure 16. Gateway, Virtual Service and Destination Rules OK</div>
 </div>
+<div class="sect2">
+<h3 id="06-configureegressaccesstest"><a class="anchor" href="#06-configureegressaccesstest"></a>Testing egress traffic</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -699,6 +731,7 @@ You have deployed a nginx mTLS service and you are receiving a <em>400 Bad Reque
 <img src="_images/jump-app-mesh-external-nginx-access-egress-con-ok-mtls.png" alt="jump app mesh external nginx access egress con ok mtls">
 </div>
 <div class="title">Figure 17. nginx.example.com mTLS connection OK</div>
+</div>
 </div>
 </div>
 </div>
