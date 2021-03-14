@@ -189,8 +189,11 @@ do
 done
 
 
-## Create general service
+###
+## CHAPTER 6 
+###
 
+## Create general service
 oc new-project mesh-external
 oc create sa nginx -n mesh-external
 oc adm policy add-scc-to-user anyuid -z nginx -n mesh-external
@@ -199,6 +202,8 @@ oc create -n mesh-external secret generic nginx-ca-certs --from-file=certs/ca-ch
 oc create configmap nginx-configmap -n mesh-external --from-file=nginx.conf=files/nginx.conf
 oc create -f 00-nginx-svc-pod.yml -n mesh-external
 
+## Configure mesh 
+oc create -f 01-mesh.yml -n istio-system
 oc create -n istio-system secret tls nginx-client-certs --key certs/nginx.example.com.key.pem --cert certs/nginx.example.com.cert.pem
 oc create -n istio-system secret generic nginx-ca-certs --from-file=certs/ca-chain.cert.pem
 

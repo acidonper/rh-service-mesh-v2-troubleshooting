@@ -94,7 +94,7 @@ include::partial$oc_process_apply.adoc[]
 image::jump-app-mesh-external-nginx-access-objects.png[]
 
 [#06-createtesting]
-== Create a Testing Microservice
+== Create the Testing Microservice
 
 * Create Kubernetes Secrets to hold the client’s certificates
 
@@ -197,6 +197,9 @@ include::partial$oc_process_apply.adoc[]
 
 .Gateway, Virtual Service and Destination Rules OK
 image::jump-app-mesh-external-nginx-access-egress-objects.png[]
+
+[#06-configureegressaccesstest]
+=== Testing egress traffic
 
 * Test nginx service through testing pod via egress gateway
 
