@@ -55,3 +55,9 @@ In this phase, you will understand how connectivity security is implemented in I
 
 xref:05-secure-ingress-traffic[Start this exercise...]
 
+=== Secure Egress Traffic Troubleshooting
+
+In this phase, you will work with mesh external services using secure connections based on mTLS. You will create an external mTLS service and create a testing pod in your current namespace in order to test this mTLS connection via the _Egress Gateway_.
+
+xref:06-egress-traffic[Start this exercise...]
+

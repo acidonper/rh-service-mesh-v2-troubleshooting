@@ -5,7 +5,7 @@
 
 As you know, Gateway describes a load balancer operating at the edge of the mesh receiving incoming or outgoing HTTP/TCP connections.
 
-During this step, you will review how to work with a secure HTTPS service through Egress Gateway and a custom certificate.
+During this step, you will review how to work with a secure HTTPS service through _Egress Gateway_ and a custom certificate. The main idea of this chapter is work with mesh external services using secure connections based on mTLS. You will create an external mTLS service and create a testing pod in your current namespace in order to test this mTLS connection via the _Egress Gateway_.
 
 [#06-addcert]
 == Create in Istio the Custom Certificate
