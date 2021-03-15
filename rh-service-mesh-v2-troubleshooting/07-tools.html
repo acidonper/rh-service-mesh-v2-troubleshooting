@@ -409,7 +409,7 @@
 <div class="title">Figure 2. Spans in jaeger</div>
 </div>
 <div class="paragraph">
-<p>Those are called spans and they represent a logical unit of work in Jaeger that has an operation name, the start time of the operation, and the duration. Spans may be nested and ordered to model causal relationships.</p>
+<p>Those are called spans and they represent a logical unit of work in Jaeger that has an operation name, the start time of the operation, and the duration. Spans may be nested and ordered to model causal relationships. This could help you see where is your application spending more time and find bottlenecks in an easy manner.</p>
 </div>
 </div>
 </div>
@@ -432,6 +432,97 @@
 <img src="_images/jump-app-kiali-delay.png" alt="jump app kiali delay">
 </div>
 <div class="title">Figure 3. See delay in Kiali</div>
+</div>
+<div class="paragraph">
+<p>You&#8217;ll notice that requests in <code>back-golang</code> are now taking roughly 2 seconds. This capacity of Kiali to see the response time is another way of watching where your application is spending more time. But you can play with other metrics that Kiali gives you like Request Percentage, Requests per Second and even see the traffic animation and security.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="07-dump"><a class="anchor" href="#07-dump"></a>Check a config dump</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Another tool you have for troubleshooting is the config dump of the Envoy proxies of the mesh. The config dump has all the information, in JSON format, about how are the Envoy proxies configured in the mesh. To do this, you just need to execute a request to the <code>/config_dump</code> endpoint inside any sidecar in your mesh.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc exec &lt;back_golang_pod_id&gt; -c istio-proxy -- curl localhost:15000/config_dump &gt; dump.json</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will get a very long file that looks like this:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/config_dump.png" alt="config dump">
+</div>
+<div class="title">Figure 4. Envoy config dump</div>
+</div>
+<div class="paragraph">
+<p>Take some time checking the config dump, since this file has all the configuration parameters of the Envoy proxies inside the Service Mesh.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="07-stats"><a class="anchor" href="#07-stats"></a>Check the stats</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Envoy also has stats of their proxies that you can see by doing a request to the <code>/stats</code> endpoint inside the proxy.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc exec &lt;back_golang_pod_id&gt; -c istio-proxy -- curl localhost:15000/stats &gt; stats.txt</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this file you have different metrics that Envoy collects that you can use to see the current status of the mesh. For example, in the previous lab about Traffic Management you used these stats to see the pending requests in the Circuit Breaking section. You can also see the number of http responses, how many times a specific code came in the response, total requests sent, total bytes sent, etc.</p>
+</div>
+<div class="paragraph">
+<p>To know more about all the statistics, you could check the <a href="https://www.envoyproxy.io/docs/envoy/latest/configuration/upstream/cluster_manager/cluster_stats#statistics">Envoy docs</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="07-logging"><a class="anchor" href="#07-logging"></a>Envoy logging</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Envoy even let you change the logging level inside a sidecar by doing some http requests too. If you want to see all the logging possibilities and levels, execute the following command:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc exec &lt;back_golang_pod_id&gt; -c istio-proxy -- curl -X POST localhost:15000/logging</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You&#8217;ll get something similar to this, which is the list of loggers you can edit to see more information:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/envoy-logging.png" alt="envoy logging">
+</div>
+<div class="title">Figure 5. Active Loggers</div>
+</div>
+<div class="paragraph">
+<p>Now, you will change the level of one of them:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc exec &lt;back_golang_pod_id&gt; -c istio-proxy -- curl -X POST localhost:15000/logging?http=debug</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To check it, run the following command:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc logs -f &lt;back_golang_pod_id&gt; -c istio-proxy</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should start seeing http debug logs for that sidecar.</p>
+</div>
+<div class="paragraph">
+<p>Configuration extends to all proxy sidecars, so if you do a <code>config_dump</code> in any sidecar you should get very similar results, but logging is specific for each sidecar, so test watching the logs of another sidecar in your namespace to check that you will not see the http debug logs as in the one you recently modified.</p>
 </div>
 </div>
 </div>
