@@ -286,31 +286,49 @@
     <a class="nav-link" href="06-egress-traffic.html">6. Egress Traffic Troubleshooting</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#06-sds">5.1 Secure Egress Traffic with mTLS</a>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#06-addcert">5.2 Create in Istio the Custom Certificate</a>
+    <a class="nav-link" href="#06-sds">6.1 Secure Egress Traffic with mTLS</a>
   </li>
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="#06-addcert">5.3 Create Nginx service</a>
+    <a class="nav-link" href="#06-createservice">6.2 Create the <em>External Service</em></a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="#06-createsevs">5.3.1 Configure Nginx service Istio Objects</a>
+    <a class="nav-link" href="#06-addcert">6.2.1 Add a Custom Certificate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#06-createnginx">6.2.2 Create Nginx service</a>
   </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#06-createtesting">5.4 Create the Testing Microservice</a>
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="#06-createtesting">6.3 Create the Testing Microservice</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#06-createtestingcerts">6.3.1 Add a Custom Certificate</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#06-createtestingdepl">6.3.2 Create Testing Tool Deployment</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#06-createsevs">6.3.3 Configure Nginx service Istio Objects</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#06-createsevstest">6.3.4 Test Nginx service through testing tool</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="#06-configureegressaccess">5.5 Configure mutual TLS origination for egress traffic</a>
+    <a class="nav-link" href="#06-configureegressaccess">6.4 Configure mutual TLS origination for egress traffic</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="#06-configureegressaccesstest">5.5.1 Testing egress traffic</a>
+    <a class="nav-link" href="#06-configureegressaccesstest">6.4.1 Testing egress traffic</a>
   </li>
 </ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#06-finalquestion">6.5 Final Question</a>
   </li>
 </ul>
   </li>
@@ -365,11 +383,35 @@
 <div class="paragraph">
 <p>During this step, you will review how to work with a secure HTTPS service through <em>Egress Gateway</em> and a custom certificate. The main idea of this chapter is work with mesh external services using secure connections based on mTLS. You will create an external mTLS service and create a testing pod in your current namespace in order to test this mTLS connection via the <em>Egress Gateway</em>.</p>
 </div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-egress-traffic.png" alt="jump app egress traffic">
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="06-addcert"><a class="anchor" href="#06-addcert"></a>Create in Istio the Custom Certificate</h2>
+<h2 id="06-createservice"><a class="anchor" href="#06-createservice"></a>Create the <em>External Service</em></h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>In this part, you will create an <em>external service</em> in Openshift but away from the <em>Service Mesh</em> in order to create a secure service protected by mTLS.</p>
+</div>
+<div class="paragraph">
+<p>Just a information, this service is based on Nginx server with a custom certificates generated with openssl.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-egress-service.png" alt="jump app egress service">
+</div>
+</div>
+<div class="sect2">
+<h3 id="06-addcert"><a class="anchor" href="#06-addcert"></a>Add a Custom Certificate</h3>
+<div class="paragraph">
+<p>First of all, it is required to create the certificates which will be used by the Nginx server in order to authorize client access.</p>
+</div>
+<div class="paragraph">
+<p>Please, follow the next steps in order to create these certificates in Kubernetes secrets:</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
@@ -407,10 +449,14 @@
 <div class="title">Figure 2. CA certificates OK</div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="06-createnginx"><a class="anchor" href="#06-createnginx"></a>Create Nginx service</h3>
+<div class="paragraph">
+<p>Once the certificates have been created, you should create a configuration file which contains the security settings and then deploy the Nginx server.</p>
 </div>
-<div class="sect1">
-<h2 id="06-createnginx"><a class="anchor" href="#06-createnginx"></a>Create Nginx service</h2>
-<div class="sectionbody">
+<div class="paragraph">
+<p>Please, perform the following steps in order to meet the previous requirements:</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
@@ -495,32 +541,28 @@ You have deployed a mTLS service and you are receiving a <em>400 Bad Request</em
 </tr>
 </table>
 </div>
-<div class="sect2">
-<h3 id="06-createsevs"><a class="anchor" href="#06-createsevs"></a>Configure Nginx service Istio Objects</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>Create a <em>ServiceEntry</em> and a <em>VirtualService</em> in your namespace</p>
-</li>
-</ul>
-</div>
-<div class="listingblock lines_space console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 06-secure-egress-traffic-troubleshooting/01-jump-app-nginx-vs-se.yaml --param-file=params.env --ignore-unknown-parameters | oc apply -f - -n &lt;user_namespace&gt;</code></pre>
-</div>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/jump-app-mesh-external-nginx-access-objects.png" alt="jump app mesh external nginx access objects">
-</div>
-<div class="title">Figure 7. Nginx ServiceEntry and VirtualService ok</div>
-</div>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="06-createtesting"><a class="anchor" href="#06-createtesting"></a>Create the Testing Microservice</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>In order to test your Nginx service, it is required to create a microservice-based testing tool which allows you to stablish secure connections based on mTLS.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-test-tool.png" alt="jump app test tool">
+</div>
+</div>
+<div class="sect2">
+<h3 id="06-createtestingcerts"><a class="anchor" href="#06-createtestingcerts"></a>Add a Custom Certificate</h3>
+<div class="paragraph">
+<p>First of all, it is required to create the client and CA certificates in order to be able to generate secure connections.</p>
+</div>
+<div class="paragraph">
+<p>Please, follow the next steps to allocate these certificates in Kubernetes secret objects:</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
@@ -537,7 +579,7 @@ You have deployed a mTLS service and you are receiving a <em>400 Bad Request</em
 <div class="content">
 <img src="_images/jump-app-mesh-external-nginx-access-certs.png" alt="jump app mesh external nginx access certs">
 </div>
-<div class="title">Figure 8. Client certificates OK</div>
+<div class="title">Figure 7. Client certificates OK</div>
 </div>
 <div class="ulist">
 <ul>
@@ -555,7 +597,16 @@ You have deployed a mTLS service and you are receiving a <em>400 Bad Request</em
 <div class="content">
 <img src="_images/jump-app-mesh-external-nginx-access-ca-certs.png" alt="jump app mesh external nginx access ca certs">
 </div>
-<div class="title">Figure 9. CA certificates OK</div>
+<div class="title">Figure 8. CA certificates OK</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="06-createtestingdepl"><a class="anchor" href="#06-createtestingdepl"></a>Create Testing Tool Deployment</h3>
+<div class="paragraph">
+<p>Once the certificates have been saved in Openshift, it is time to deploy your testing microsevice deployment. Essentially, this microservice is a container image with <em>curl</em> installed.</p>
+</div>
+<div class="paragraph">
+<p>Please, follow the next steps to deploy this new microservice in your main namespace:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -573,7 +624,7 @@ You have deployed a mTLS service and you are receiving a <em>400 Bad Request</em
 <div class="content">
 <img src="_images/jump-app-mesh-external-nginx-client-pod.png" alt="jump app mesh external nginx client pod">
 </div>
-<div class="title">Figure 10. Testing service created</div>
+<div class="title">Figure 9. Testing service created</div>
 </div>
 <div class="ulist">
 <ul>
@@ -591,12 +642,51 @@ You have deployed a mTLS service and you are receiving a <em>400 Bad Request</em
 <div class="content">
 <img src="_images/jump-app-mesh-external-nginx-client-pod-ok.png" alt="jump app mesh external nginx client pod ok">
 </div>
-<div class="title">Figure 11. Testing service pod OK</div>
+<div class="title">Figure 10. Testing service pod OK</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="06-createsevs"><a class="anchor" href="#06-createsevs"></a>Configure Nginx service Istio Objects</h3>
+<div class="paragraph">
+<p>At this time, you have a Nginx secure service and a testing microservice installed and configured with a set of client/server certificates and their respective CA certificate.</p>
+</div>
+<div class="paragraph">
+<p>Finally, it is required to create the <em>Istio</em> object in order to make able the connectivity between your testing microservice and the <em>mesh-external</em> Nginx service.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-testing-nginx-connection.png" alt="jump app testing nginx connection">
+</div>
+<div class="title">Figure 11. Testing service &#8594; Nginx service</div>
+</div>
+<div class="paragraph">
+<p>Please, follow the next steps to make able this connectivity through <em>Istio</em> objects:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Test nginx service via testing pod</p>
+<p>Create a <em>ServiceEntry</em> and a <em>VirtualService</em> in your namespace</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_space console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 06-secure-egress-traffic-troubleshooting/01-jump-app-nginx-vs-se.yaml --param-file=params.env --ignore-unknown-parameters | oc apply -f - -n &lt;user_namespace&gt;</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-mesh-external-nginx-access-objects.png" alt="jump app mesh external nginx access objects">
+</div>
+<div class="title">Figure 12. Nginx ServiceEntry and VirtualService ok</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="06-createsevstest"><a class="anchor" href="#06-createsevstest"></a>Test Nginx service through testing tool</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Test nginx service via testing microservice</p>
 </li>
 </ul>
 </div>
@@ -609,7 +699,7 @@ You have deployed a mTLS service and you are receiving a <em>400 Bad Request</em
 <div class="content">
 <img src="_images/jump-app-mesh-external-nginx-client-mtls-ok.png" alt="jump app mesh external nginx client mtls ok">
 </div>
-<div class="title">Figure 12. Nginx service with mTLS</div>
+<div class="title">Figure 13. Nginx service with mTLS</div>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -639,7 +729,7 @@ The IP value passed in the --resolve option (1.1.1.1 below) is not significant, 
 <div class="content">
 <img src="_images/jump-app-mesh-external-nginx-svc-ok-404.png" alt="jump app mesh external nginx svc ok 404">
 </div>
-<div class="title">Figure 13. Nginx service mTLS ERROR</div>
+<div class="title">Figure 14. Nginx service mTLS ERROR</div>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -669,30 +759,33 @@ You have deployed a nginx mTLS service and you are receiving a <em>400 Bad Reque
 <div class="content">
 <img src="_images/jump-app-mesh-external-nginx-access-objects-deleted.png" alt="jump app mesh external nginx access objects deleted">
 </div>
-<div class="title">Figure 14. Nginx ServiceEntry and VirtualService deleted</div>
+<div class="title">Figure 15. Nginx ServiceEntry and VirtualService deleted</div>
+</div>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="06-configureegressaccess"><a class="anchor" href="#06-configureegressaccess"></a>Configure mutual TLS origination for egress traffic</h2>
 <div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>Clean the <em>ServiceEntry</em> and <em>VirtualService</em> in your namespace</p>
-</li>
-</ul>
-</div>
-<div class="listingblock lines_space console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 06-secure-egress-traffic-troubleshooting/01-jump-app-nginx-vs-se.yaml --param-file=params.env --ignore-unknown-parameters | oc delete -f - -n &lt;user_namespace&gt;</code></pre>
-</div>
-</div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/jump-app-mesh-external-nginx-access-objects-deleted.png" alt="jump app mesh external nginx access objects deleted">
+<img src="_images/jump-app-egress-traffic-graph.png" alt="jump app egress traffic graph">
 </div>
-<div class="title">Figure 15. Nginx ServiceEntry and VirtualService deleted</div>
+</div>
+<div class="paragraph">
+<p>When you have the testing tool and the Nginx service up and running, it is time to introduce the <em>Egress Gateway</em>.</p>
+</div>
+<div class="paragraph">
+<p>As you know, an <em>Egress Gateway</em> defines exit points from the mesh. Egress gateways allow you to apply Istio features, for example, monitoring and route rules, to traffic exiting the mesh.</p>
+</div>
+<div class="paragraph">
+<p>They are extensively used in organizations that have a strict security requirement that all traffic leaving the service mesh must flow through a set of dedicated nodes. These nodes will run on dedicated machines, separated from the rest of the nodes running applications in the cluster. These special nodes will serve for policy enforcement on the egress traffic and will be monitored more thoroughly than other nodes.</p>
+</div>
+<div class="paragraph">
+<p>Another use case is a cluster where the application nodes don’t have public IPs, so the in-mesh services that run on them cannot access the Internet. Defining an egress gateway, directing all the egress traffic through it, and allocating public IPs to the egress gateway nodes allows the application nodes to access external services in a controlled way.</p>
+</div>
+<div class="paragraph">
+<p>Taking this into account, it is time to create a set of <em>Istio objects</em> in your namespace in order to make able this connectivity through the <em>Egress Gateway</em>. Please, follow the next steps to implement this scenario:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -732,6 +825,23 @@ You have deployed a nginx mTLS service and you are receiving a <em>400 Bad Reque
 </div>
 <div class="title">Figure 17. nginx.example.com mTLS connection OK</div>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="06-finalquestion"><a class="anchor" href="#06-finalquestion"></a>Final Question</h2>
+<div class="sectionbody">
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<strong>After this new scenario implementation where the traffic is redirected through the <em>Egress Gateway</em>&#8230;&#8203; Are you sure the traffic is being redirected to your Nginx service?</strong>
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
