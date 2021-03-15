@@ -25,7 +25,7 @@ Click on any of them and you will see the following page will all the jumps your
 .Spans in jaeger
 image::jump-app-jaeger-spans.png[]
 
-Those are called spans and they represent a logical unit of work in Jaeger that has an operation name, the start time of the operation, and the duration. Spans may be nested and ordered to model causal relationships.
+Those are called spans and they represent a logical unit of work in Jaeger that has an operation name, the start time of the operation, and the duration. Spans may be nested and ordered to model causal relationships. This could help you see where is your application spending more time and find bottlenecks in an easy manner.
 
 [#07-delay]
 == See a delay in Kiali
@@ -42,3 +42,73 @@ You are adding 2 seconds of delay and since there are 2 jumps, the *front* is go
 .See delay in Kiali
 image::jump-app-kiali-delay.png[]
 
+You'll notice that requests in `back-golang` are now taking roughly 2 seconds. This capacity of Kiali to see the response time is another way of watching where your application is spending more time. But you can play with other metrics that Kiali gives you like Request Percentage, Requests per Second and even see the traffic animation and security. 
+
+[#07-dump]
+== Check a config dump
+
+Another tool you have for troubleshooting is the config dump of the Envoy proxies of the mesh. The config dump has all the information, in JSON format, about how are the Envoy proxies configured in the mesh. To do this, you just need to execute a request to the `/config_dump` endpoint inside any sidecar in your mesh.
+
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc exec <back_golang_pod_id> -c istio-proxy -- curl localhost:15000/config_dump > dump.json
+----
+
+You will get a very long file that looks like this:
+
+.Envoy config dump
+image::config_dump.png[]
+
+Take some time checking the config dump, since this file has all the configuration parameters of the Envoy proxies inside the Service Mesh. 
+
+[#07-stats]
+== Check the stats
+
+Envoy also has stats of their proxies that you can see by doing a request to the `/stats` endpoint inside the proxy.
+
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc exec <back_golang_pod_id> -c istio-proxy -- curl localhost:15000/stats > stats.txt
+----
+
+In this file you have different metrics that Envoy collects that you can use to see the current status of the mesh. For example, in the previous lab about Traffic Management you used these stats to see the pending requests in the Circuit Breaking section. You can also see the number of http responses, how many times a specific code came in the response, total requests sent, total bytes sent, etc. 
+
+To know more about all the statistics, you could check the link:https://www.envoyproxy.io/docs/envoy/latest/configuration/upstream/cluster_manager/cluster_stats#statistics[Envoy docs].
+
+[#07-logging]
+== Envoy logging
+
+Envoy even let you change the logging level inside a sidecar by doing some http requests too. If you want to see all the logging possibilities and levels, execute the following command:
+
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc exec <back_golang_pod_id> -c istio-proxy -- curl -X POST localhost:15000/logging
+----
+
+You'll get something similar to this, which is the list of loggers you can edit to see more information:
+
+.Active Loggers
+image::envoy-logging.png[]
+
+Now, you will change the level of one of them:
+
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc exec <back_golang_pod_id> -c istio-proxy -- curl -X POST localhost:15000/logging?http=debug
+----
+
+To check it, run the following command:
+
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc logs -f <back_golang_pod_id> -c istio-proxy
+----
+
+You should start seeing http debug logs for that sidecar. 
+
+Configuration extends to all proxy sidecars, so if you do a `config_dump` in any sidecar you should get very similar results, but logging is specific for each sidecar, so test watching the logs of another sidecar in your namespace to check that you will not see the http debug logs as in the one you recently modified.
