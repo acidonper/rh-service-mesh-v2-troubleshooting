@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Untitled :: Red Hat Service Mesh - Troubleshooting</title>
+    <title>Service Mesh Troubleshooting Tools :: Red Hat Service Mesh - Troubleshooting</title>
     <link rel="canonical" href="http://localhost:3000/rhs-build-course/index.html/rh-service-mesh-v2-troubleshooting/07-tools.html">
     <link rel="prev" href="06-egress-traffic.html">
     <meta name="generator" content="Antora 2.3.4">
@@ -372,8 +372,68 @@
   </div>
   <div class="content">
 <article class="doc">
+<h1 class="page">Service Mesh Troubleshooting Tools</h1>
+<div class="sect1">
+<h2 id="07-jaeger"><a class="anchor" href="#07-jaeger"></a>See traces in Jaeger</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>istioctl</p>
+<p>Distributed tracing is a technique that is used to tie the information about different units of work together—usually executed in different processes or hosts—in order to understand a whole chain of events in a distributed transaction. Distributed tracing lets developers visualize call flows in large service oriented architectures. It can be invaluable in understanding serialization, parallelism, and sources of latency.</p>
+</div>
+<div class="paragraph">
+<p>OpenShift Service Mesh comes with Jaeger and you can use it to monitor distributed transactions, optimize performance and latency and to perform root cause analysis.</p>
+</div>
+<div class="paragraph">
+<p>Before opening Jaeger to see the traces of the <em>Jump App</em> application, you need to create traffic, so go to the <strong>front</strong> and make several requests. After that open Jaeger, you can find the route like this:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get routes -n istio-system | grep jaeger</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once in Jaeger, select <code>back-golang.&lt;user-namespace&gt;</code> as the Service in the left menu and then click at the bottom on "Find Traces". You will see that several traces appear on the right:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-jaeger-traces.png" alt="jump app jaeger traces">
+</div>
+<div class="title">Figure 1. Traces in jaeger</div>
+</div>
+<div class="paragraph">
+<p>Click on any of them and you will see the following page will all the jumps your application did and how long did they take:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-jaeger-spans.png" alt="jump app jaeger spans">
+</div>
+<div class="title">Figure 2. Spans in jaeger</div>
+</div>
+<div class="paragraph">
+<p>Those are called spans and they represent a logical unit of work in Jaeger that has an operation name, the start time of the operation, and the duration. Spans may be nested and ordered to model causal relationships.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="07-delay"><a class="anchor" href="#07-delay"></a>See a delay in Kiali</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As you know from the last course, you can add delay to your applications in the mesh to do some testing. In this lab we are going to add a delay in the <code>back-golang</code> service to see how it shows in Jaeger and Kiali when a service is adding some latency to your workflow.</p>
+</div>
+<div class="listingblock lines_space console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 07-troubleshooting-tools/00-jump-app-delay.yaml --param-file=params.env --ignore-unknown-parameters | oc apply -f - -n &lt;user_namespace&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You are adding 2 seconds of delay and since there are 2 jumps, the <strong>front</strong> is going to receive the response 4 seconds late. Go to the <strong>front</strong>, set several retries (maybe 10) and the <em>Calls Interval</em> put it in 4 to send requests every 4 seconds. Now go to <em>Kiali</em> and check the delay by toggling the <em>Response Time</em> in the Display menu. You should see something similar to this:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/jump-app-kiali-delay.png" alt="jump app kiali delay">
+</div>
+<div class="title">Figure 3. See delay in Kiali</div>
+</div>
+</div>
 </div>
 <nav class="pagination">
   <span class="prev"><a href="06-egress-traffic.html">6. Egress Traffic Troubleshooting</a></span>

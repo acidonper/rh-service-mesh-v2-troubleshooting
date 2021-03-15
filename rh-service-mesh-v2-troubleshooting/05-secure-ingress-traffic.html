@@ -845,6 +845,22 @@ EOF</code></pre>
 <div class="ulist">
 <ul>
 <li>
+<p>Copy certificates to the <em>Ingress Gateway</em> pod</p>
+</li>
+</ul>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project istio-system
+oc exec &lt;ingress_gateway_pod_id&gt; -- mkdir /tmp/&lt;user_namespace&gt;
+oc cp istio.test.crt &lt;ingress_gateway_pod_id&gt;:/tmp/&lt;user_namespace&gt;
+oc cp istio.test.key &lt;ingress_gateway_pod_id&gt;:/tmp/&lt;user_namespace&gt;
+oc cp ca-cert.pem &lt;ingress_gateway_pod_id&gt;:/tmp/&lt;user_namespace&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
 <p>Connect to the <em>Ingress Gateway</em> pod</p>
 </li>
 </ul>
@@ -852,23 +868,8 @@ EOF</code></pre>
 <div class="listingblock lines_7 console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project istio-system
-oc rsh &lt;ingress_gateway_pod_id&gt;</code></pre>
-</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Create certificates manually in the <em>Ingress Gateway</em></p>
-</li>
-</ul>
-</div>
-<div class="listingblock lines_7 console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">mkdir /tmp/&lt;user_namespace&gt;
-cd /tmp/&lt;user_namespace&gt;
-vi istio.test.crt
-vi istio.test.key
-vi ca-cert.pem</code></pre>
+oc rsh &lt;ingress_gateway_pod_id&gt;
+cd /tmp/&lt;user_namespace&gt;</code></pre>
 </div>
 </div>
 <div class="ulist">
