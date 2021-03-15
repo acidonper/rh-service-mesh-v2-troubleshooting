@@ -1,2 +1,44 @@
-istioctl
+= Service Mesh Troubleshooting Tools
+
+[#07-jaeger]
+== See traces in Jaeger
+
+Distributed tracing is a technique that is used to tie the information about different units of work together—usually executed in different processes or hosts—in order to understand a whole chain of events in a distributed transaction. Distributed tracing lets developers visualize call flows in large service oriented architectures. It can be invaluable in understanding serialization, parallelism, and sources of latency.
+
+OpenShift Service Mesh comes with Jaeger and you can use it to monitor distributed transactions, optimize performance and latency and to perform root cause analysis. 
+
+Before opening Jaeger to see the traces of the _Jump App_ application, you need to create traffic, so go to the *front* and make several requests. After that open Jaeger, you can find the route like this:
+
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc get routes -n istio-system | grep jaeger
+----
+
+Once in Jaeger, select `back-golang.<user-namespace>` as the Service in the left menu and then click at the bottom on "Find Traces". You will see that several traces appear on the right:
+
+.Traces in jaeger
+image::jump-app-jaeger-traces.png[]
+
+Click on any of them and you will see the following page will all the jumps your application did and how long did they take:
+
+.Spans in jaeger
+image::jump-app-jaeger-spans.png[]
+
+Those are called spans and they represent a logical unit of work in Jaeger that has an operation name, the start time of the operation, and the duration. Spans may be nested and ordered to model causal relationships.
+
+[#07-delay]
+== See a delay in Kiali
+
+As you know from the last course, you can add delay to your applications in the mesh to do some testing. In this lab we are going to add a delay in the `back-golang` service to see how it shows in Jaeger and Kiali when a service is adding some latency to your workflow.
+
+:file: 07-troubleshooting-tools/00-jump-app-delay.yaml
+:namespace: <user_namespace>
+
+include::partial$oc_process_apply.adoc[]
+
+You are adding 2 seconds of delay and since there are 2 jumps, the *front* is going to receive the response 4 seconds late. Go to the *front*, set several retries (maybe 10) and the _Calls Interval_ put it in 4 to send requests every 4 seconds. Now go to _Kiali_ and check the delay by toggling the _Response Time_ in the Display menu. You should see something similar to this:  
+
+.See delay in Kiali
+image::jump-app-kiali-delay.png[]
 

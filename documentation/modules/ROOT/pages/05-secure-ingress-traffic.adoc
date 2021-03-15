@@ -271,6 +271,19 @@ oc get pods -n istio-system
 .Istio ControlPlane Pods
 image::ocp-istio-controlplane-pods.png[]
 
+* Copy certificates to the _Ingress Gateway_ pod
+
+[.lines_7]
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc project istio-system
+oc exec <ingress_gateway_pod_id> -- mkdir /tmp/<user_namespace>
+oc cp istio.test.crt <ingress_gateway_pod_id>:/tmp/<user_namespace>
+oc cp istio.test.key <ingress_gateway_pod_id>:/tmp/<user_namespace>
+oc cp ca-cert.pem <ingress_gateway_pod_id>:/tmp/<user_namespace>
+----
+
 * Connect to the _Ingress Gateway_ pod
 
 [.lines_7]
@@ -279,19 +292,7 @@ image::ocp-istio-controlplane-pods.png[]
 ----
 oc project istio-system
 oc rsh <ingress_gateway_pod_id> 
-----
-
-* Create certificates manually in the _Ingress Gateway_
-
-[.lines_7]
-[.console-input]
-[source,input,subs="+macros,+attributes"]
-----
-mkdir /tmp/<user_namespace>
 cd /tmp/<user_namespace>
-vi istio.test.crt
-vi istio.test.key
-vi ca-cert.pem
 ----
 
 * Perform a HTTP request to the k8s service _back-golang_ using curl command
