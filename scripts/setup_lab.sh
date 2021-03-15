@@ -203,7 +203,7 @@ oc create configmap nginx-configmap -n mesh-external --from-file=nginx.conf=file
 oc create -f 00-nginx-svc-pod.yml -n mesh-external
 
 ## Configure mesh 
-oc create -f 01-mesh.yml -n istio-system
+oc create -f files/01-mesh.yml -n istio-system
 oc create -n istio-system secret tls nginx-client-certs --key certs/nginx.example.com.key.pem --cert certs/nginx.example.com.cert.pem
 oc create -n istio-system secret generic nginx-ca-certs --from-file=certs/ca-chain.cert.pem
 
