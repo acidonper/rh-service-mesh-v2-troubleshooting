@@ -112,6 +112,27 @@ rules:
     - get
     - list
     - watch
+  - apiGroups:
+    - apps
+    resources:
+    - daemonsets
+    - deployments
+    - deployments/rollback
+    - deployments/scale
+    - replicasets
+    - replicasets/scale
+    - statefulsets
+    - statefulsets/scale
+    verbs:
+    - patch
+    - update
+  - apiGroups:
+    - networking.istio.io
+    resources:
+    - serviceentries
+    - destinationrules
+    verbs:
+    - create
 EOF
 
 cat admin-mesh-custom-role.yaml | oc apply -f -
@@ -187,67 +208,3 @@ do
   oc adm policy add-role-to-user admin $i -n $i-namespace
   oc adm policy add-role-to-user admin $i -n $i-namespace-mesh-external
 done
-
-
-###
-## CHAPTER 6 
-###
-
-## Create general service
-oc new-project mesh-external
-oc create sa nginx -n mesh-external
-oc adm policy add-scc-to-user anyuid -z nginx -n mesh-external
-oc create -n mesh-external secret tls nginx-server-certs --key certs/nginx.example.com.key.pem --cert certs/nginx.example.com.cert.pem
-oc create -n mesh-external secret generic nginx-ca-certs --from-file=certs/ca-chain.cert.pem
-oc create configmap nginx-configmap -n mesh-external --from-file=nginx.conf=files/nginx.conf
-oc create -f 00-nginx-svc-pod.yml -n mesh-external
-
-## Configure mesh 
-oc create -f files/01-mesh.yml -n istio-system
-oc create -n istio-system secret tls nginx-client-certs --key certs/nginx.example.com.key.pem --cert certs/nginx.example.com.cert.pem
-oc create -n istio-system secret generic nginx-ca-certs --from-file=certs/ca-chain.cert.pem
-
-cat <<EOF > gateway-path.json
-[{
-  "op": "add",
-  "path": "/spec/template/spec/containers/0/volumeMounts/0",
-  "value": {
-    "mountPath": "/etc/istio/nginx-client-certs",
-    "name": "nginx-client-certs",
-    "readOnly": true
-  }
-},
-{
-  "op": "add",
-  "path": "/spec/template/spec/volumes/0",
-  "value": {
-  "name": "nginx-client-certs",
-    "secret": {
-      "secretName": "nginx-client-certs",
-      "optional": true
-    }
-  }
-},
-{
-  "op": "add",
-  "path": "/spec/template/spec/containers/0/volumeMounts/1",
-  "value": {
-    "mountPath": "/etc/istio/nginx-ca-certs",
-    "name": "nginx-ca-certs",
-    "readOnly": true
-  }
-},
-{
-  "op": "add",
-  "path": "/spec/template/spec/volumes/1",
-  "value": {
-  "name": "nginx-ca-certs",
-    "secret": {
-      "secretName": "nginx-ca-certs",
-      "optional": true
-    }
-  }
-}]
-EOF
-
-oc -n istio-system patch --type=json deploy istio-egressgateway -p "$(cat gateway-path.json)"
