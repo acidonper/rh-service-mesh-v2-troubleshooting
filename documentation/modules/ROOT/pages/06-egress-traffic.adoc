@@ -59,6 +59,7 @@ openssl x509 -req -days 365 -CA example.com.crt -CAkey example.com.key -set_seri
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
+oc new-project <user_namespace>-mesh-external
 oc project <user_namespace>-mesh-external
 oc create -n <user_namespace>-mesh-external secret tls nginx-server-certs --key my-nginx.<user_namespace>-mesh-external.svc.cluster.local.key --cert my-nginx.<user_namespace>-mesh-external.svc.cluster.local.crt
 ----
@@ -100,7 +101,7 @@ image::jump-app-mesh-external-nginx-conf-ok.png[]
 :file: 06-secure-egress-traffic-troubleshooting/00-nginx-svc-pod.yml
 :namespace: <user_namespace>-mesh-external
 
-include::partials/oc_process_apply.adoc[]
+include::partial$oc_process_apply.adoc[]
 
 .Nginx deployment and service ok
 image::jump-app-mesh-external-nginx-deployment-ok.png[]
@@ -178,7 +179,7 @@ Please, follow the next steps to deploy this new microservice in your main names
 :file: 06-secure-egress-traffic-troubleshooting/01-jump-app-sleep-svc-pod.yaml
 :namespace: <user_namespace>
 
-include::partials/oc_process_apply.adoc[]
+include::partial$oc_process_apply.adoc[]
 
 .Testing service created
 image::jump-app-mesh-external-nginx-client-pod.png[]
@@ -241,7 +242,7 @@ Taking this into account, it is time to create a set of _Istio objects_ in your 
 :file: 06-secure-egress-traffic-troubleshooting/02-jump-app-egress-gw-dr.yaml
 :namespace: <user_namespace>
 
-include::partials/oc_process_apply.adoc[]
+include::partial$oc_process_apply.adoc[]
 
 
 .Gateway, Virtual Service and Destination Rules OK
@@ -343,7 +344,7 @@ image::jump-app-mesh-egress-patched.png[]
 :file: 06-secure-egress-traffic-troubleshooting/03-istio-system-dr.yml
 :namespace: istio-system
 
-include::partials/oc_process_apply.adoc[]
+include::partial$oc_process_apply.adoc[]
 
 .Nginx service destination rule and service entry
 image::jump-app-mesh-nginx-dr-se.png[]
