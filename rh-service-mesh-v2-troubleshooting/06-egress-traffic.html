@@ -471,7 +471,8 @@ openssl x509 -req -days 365 -CA example.com.crt -CAkey example.com.key -set_seri
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project &lt;user_namespace&gt;-mesh-external
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc new-project &lt;user_namespace&gt;-mesh-external
+oc project &lt;user_namespace&gt;-mesh-external
 oc create -n &lt;user_namespace&gt;-mesh-external secret tls nginx-server-certs --key my-nginx.&lt;user_namespace&gt;-mesh-external.svc.cluster.local.key --cert my-nginx.&lt;user_namespace&gt;-mesh-external.svc.cluster.local.crt</code></pre>
 </div>
 </div>
@@ -536,8 +537,10 @@ oc create -n &lt;user_namespace&gt;-mesh-external secret tls nginx-server-certs 
 </li>
 </ul>
 </div>
-<div class="paragraph">
-<p>Unresolved include directive in modules/ROOT/pages/06-egress-traffic.adoc - include::partials/oc_process_apply.adoc[]</p>
+<div class="listingblock lines_space console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 06-secure-egress-traffic-troubleshooting/00-nginx-svc-pod.yml --param-file=params.env --ignore-unknown-parameters | oc apply -f - -n &lt;user_namespace&gt;-mesh-external</code></pre>
+</div>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -667,8 +670,10 @@ oc create -n &lt;user_namespace&gt; secret tls nginx-client-certs --key client.e
 </li>
 </ul>
 </div>
-<div class="paragraph">
-<p>Unresolved include directive in modules/ROOT/pages/06-egress-traffic.adoc - include::partials/oc_process_apply.adoc[]</p>
+<div class="listingblock lines_space console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 06-secure-egress-traffic-troubleshooting/01-jump-app-sleep-svc-pod.yaml --param-file=params.env --ignore-unknown-parameters | oc apply -f - -n &lt;user_namespace&gt;</code></pre>
+</div>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -778,8 +783,10 @@ You have deployed a nginx mTLS service and you are receiving a <em>400 Bad Reque
 </li>
 </ul>
 </div>
-<div class="paragraph">
-<p>Unresolved include directive in modules/ROOT/pages/06-egress-traffic.adoc - include::partials/oc_process_apply.adoc[]</p>
+<div class="listingblock lines_space console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 06-secure-egress-traffic-troubleshooting/02-jump-app-egress-gw-dr.yaml --param-file=params.env --ignore-unknown-parameters | oc apply -f - -n &lt;user_namespace&gt;</code></pre>
+</div>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -912,8 +919,10 @@ EOF</code></pre>
 </li>
 </ul>
 </div>
-<div class="paragraph">
-<p>Unresolved include directive in modules/ROOT/pages/06-egress-traffic.adoc - include::partials/oc_process_apply.adoc[]</p>
+<div class="listingblock lines_space console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 06-secure-egress-traffic-troubleshooting/03-istio-system-dr.yml --param-file=params.env --ignore-unknown-parameters | oc apply -f - -n istio-system</code></pre>
+</div>
 </div>
 <div class="imageblock">
 <div class="content">
