@@ -19,8 +19,8 @@
 ** xref:03-flows.adoc#finalsteps[3.3 Final steps]
 *** xref:03-flows.adoc#annotation[3.3.1 Add Istio Sidecar annotation in Jump App deployments]
 *** xref:03-flows.adoc#routes[3.3.2 Configure Routes]
-*** xref:03-flows.adoc#test[3.4 Confirm Jump App is running again]
-*** xref:03-flows.adoc#03-kiali[3.5 Visit Kiali]
+** xref:03-flows.adoc#test[3.4 Confirm Jump App is running again]
+** xref:03-flows.adoc#03-kiali[3.5 Visit Kiali]
 
 * xref:04-ingress-traffic.adoc[4. Service Mesh Ingress Traffic Flow]
 ** xref:04-ingress-traffic.adoc#04-ingress[4.1 Introduction]

@@ -145,15 +145,6 @@ oc patch deployment back-golang-v1 -p '{"spec":{"template":{"metadata":{"annotat
 .Back Golang Patched
 image::jump-app-back-go-depl-patch.png[]
 
-[.console-input]
-[source,input,subs="+macros,+attributes"]
-----
-oc patch deployment mongo -p '{"spec":{"template":{"metadata":{"annotations":{"sidecar.istio.io/inject":"true"}}}}}' -n <user_namespace>
-----
-
-.MongoDB Patched
-image::jump-app-back-mg-depl-patch.png[]
-
 Before continuing with the following steps, please test Jump App _pods_ status, in order to be sure that 2 replicas are running for each microservice:
 
 include::partial$check_jumpapp_mesh_pod.adoc[]
@@ -170,7 +161,7 @@ Once you have a project integrated in Service Mesh, routes should be created in 
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-oc get routes -n <user_namespace> | grep -v NAME | awk '{print "oc delete route " $1}' | sh
+oc get routes -n <user_namespace> | grep -v NAME | awk '{print "oc delete route " $1 " -n <user_namespace>"}' | sh
 ----
 
 .Jump App Routes Deleted

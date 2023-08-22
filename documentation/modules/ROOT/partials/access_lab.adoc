@@ -45,5 +45,8 @@ In addition, access Openshift Console using your credentials via browser in orde
 
 - <ocp_cluster_console> (_E.g. https://console-openshift-console.apps.tutorialrhmesh.sandbox507.opentlc.com_)
 
+.Openshift Console Oauth
+image:ocp_console_oauth.png[]
+
 .Openshift Console
 image::ocp_console.png[]
