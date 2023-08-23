@@ -87,7 +87,8 @@ image::ocp-routers-pods.png[]
 [source,input,subs="+macros,+attributes"]
 ----
 oc project openshift-ingress
-oc rsh <router_pod_id> 
+POD=$(oc get po -o jsonpath='{.items[0].metadata.name}' -n openshift-ingress)
+oc rsh $POD 
 ----
 
 * Execute a HTTP request using curl command
@@ -141,7 +142,8 @@ image::ocp-routers-pods.png[]
 [source,input,subs="+macros,+attributes"]
 ----
 oc project openshift-ingress
-oc rsh <router_pod_id> 
+POD=$(oc get po -o jsonpath='{.items[0].metadata.name}' -n openshift-ingress)
+oc rsh $POD  
 ----
 
 * Execute a HTTP request using curl command
@@ -178,7 +180,7 @@ oc get pods -n istio-system
 ----
 
 .Istio ControlPlane Pods
-image::ocp-routers-pods.png[]
+image::ocp-istio-controlplane-pods.png[]
 
 * Connect to the _Ingress Gateway_ pod
 
@@ -187,7 +189,8 @@ image::ocp-routers-pods.png[]
 [source,input,subs="+macros,+attributes"]
 ----
 oc project istio-system
-oc rsh <ingress_gateway_pod_id> 
+POD=$(oc get po -l app=istio-ingressgateway -o jsonpath='{.items[0].metadata.name}' -n istio-system)
+oc rsh $POD
 ----
 
 * Execute a HTTP request using curl command
@@ -232,7 +235,7 @@ oc get pods -n istio-system
 ----
 
 .Istio ControlPlane Pods
-image::ocp-routers-pods.png[]
+image::ocp-istio-controlplane-pods.png[]
 
 * Connect to the _ingress gateway_ pod
 
@@ -241,7 +244,8 @@ image::ocp-routers-pods.png[]
 [source,input,subs="+macros,+attributes"]
 ----
 oc project istio-system
-oc rsh <ingress_gateway_pod_id> 
+POD=$(oc get po -l app=istio-ingressgateway -o jsonpath='{.items[0].metadata.name}' -n istio-system)
+oc rsh $POD 
 ----
 
 * Execute a HTTP request using curl command
@@ -250,7 +254,7 @@ oc rsh <ingress_gateway_pod_id>
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-curl -XGET -v --header "Host: back-golang-<user_namespace>.<openshift_apps_domain>" http://back-golang.<user_namespace>.svc.cluster.local:8442 -v
+curl -XGET -v --header "Host: back-golang-<user_namespace>.<openshift_apps_domain>" http://localhost:8080 -v
 ----
 
 .HTTP Response 503
@@ -300,7 +304,8 @@ image::ocp-istio-controlplane-pods.png[]
 [source,input,subs="+macros,+attributes"]
 ----
 oc project istio-system
-oc rsh <ingress_gateway_pod_id> 
+POD=$(oc get po -l app=istio-ingressgateway -o jsonpath='{.items[0].metadata.name}' -n istio-system)
+oc rsh $POD  
 ----
 
 * Execute a HTTP request using curl command
