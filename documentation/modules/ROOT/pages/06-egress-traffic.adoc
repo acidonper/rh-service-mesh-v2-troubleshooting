@@ -276,7 +276,7 @@ image:jump-app-mesh-external-nginx-istio-system-certs.png[]
 
 * Create a _destination rule_ and a _service entry_ to direct the traffic from the egress gateway to the external service
 
-:file: 06-secure-egress-traffic-troubleshooting/03-istio-system-dr.yml
+:file: 06-secure-egress-traffic-troubleshooting/03-istio-system-dr-sds.yml
 :namespace: istio-system
 
 include::partial$oc_process_apply.adoc[]
