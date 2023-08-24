@@ -122,7 +122,9 @@ image::jump-app-mesh-external-nginx-pods-ok.png[]
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-oc -n <user_namespace>-mesh-external rsh <nginx_pod_id>  curl localhost:443 -k -v
+oc project <user_namespace>-mesh-external
+POD=$(oc get po -l run=my-nginx -o jsonpath='{.items[0].metadata.name}')
+oc rsh $POD curl localhost:443 -k -v
 ----
 
 .Nginx service mTLS ERROR 
@@ -203,7 +205,9 @@ image::jump-app-mesh-external-nginx-client-pod-ok.png[]
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-oc -n <user_namespace> exec -it <testing_pod_id> -c sleep -- curl -v --cacert /etc/nginx-ca-certs/example.com.crt --cert /etc/nginx-client-certs/tls.crt --key /etc/nginx-client-certs/tls.key https://my-nginx.<user_namespace>-mesh-external.svc.cluster.local -k
+oc project <user_namespace>
+POD=$(oc get po -l app=sleep -o jsonpath='{.items[0].metadata.name}')
+oc exec -it $POD -c sleep -- curl -v --cacert /etc/nginx-ca-certs/example.com.crt --cert /etc/nginx-client-certs/tls.crt --key /etc/nginx-client-certs/tls.key https://my-nginx.<user_namespace>-mesh-external.svc.cluster.local -k
 ----
 
 .Nginx service with mTLS
@@ -214,7 +218,9 @@ image::jump-app-mesh-external-nginx-client-mtls-ok.png[]
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-oc -n <user_namespace> exec -it <testing_pod_id> -c sleep -- curl -v https://my-nginx.<user_namespace>-mesh-external.svc.cluster.local -k
+oc project <user_namespace>
+POD=$(oc get po -l app=sleep -o jsonpath='{.items[0].metadata.name}')
+oc exec -it $POD -c sleep -- curl -v https://my-nginx.<user_namespace>-mesh-external.svc.cluster.local -k
 ----
 
 .Nginx service mTLS ERROR 
@@ -257,87 +263,16 @@ On the other hand, it is required create a set of Istio objects in _istio-system
 
 Please, follow the next steps to perform the previous tasks:
 
-* Create the CA certificate in a Kubernetes secret
+* Create the TLS certificate in a Kubernetes secret
 
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-oc create -n istio-system secret generic <user_namespace>-mesh-external-nginx-ca-certs --from-file=example.com.crt
+oc create secret -n istio-system generic <user_namespace>-mesh-external-egress-nginx-client-certs  --from-file=tls.key=client.example.com.key  --from-file=tls.crt=client.example.com.crt  --from-file=ca.crt=example.com.crt
 ----
 
-.Nginx service with mTLS
-image::jump-app-mesh-external-nginx-istio-system-cert-ca.png[]
-
-* Create the client mTLS certificates in another Kubernetes secret
-
-[.console-input]
-[source,input,subs="+macros,+attributes"]
-----
-oc create -n istio-system secret tls <user_namespace>-mesh-external-nginx-client-certs --key client.example.com.key --cert client.example.com.crt
-----
-
-.Nginx service with mTLS
-image::jump-app-mesh-external-nginx-istio-system-cert.png[]
-
-* Create a _patch_ file in order to edit the _Egress Gateway_ deployment
-
-[.console-input]
-[source,input,subs="+macros,+attributes"]
-----
-cat > gateway-patch.json <<EOF
-[{
-  "op": "add",
-  "path": "/spec/template/spec/containers/0/volumeMounts/0",
-  "value": {
-    "mountPath": "/etc/istio/<user_namespace>-mesh-external/nginx-client-certs",
-    "name": "<user_namespace>-mesh-external-nginx-client-certs",
-    "readOnly": true
-  }
-},
-{
-  "op": "add",
-  "path": "/spec/template/spec/volumes/0",
-  "value": {
-  "name": "<user_namespace>-mesh-external-nginx-client-certs",
-    "secret": {
-      "secretName": "<user_namespace>-mesh-external-nginx-client-certs",
-      "optional": true
-    }
-  }
-},
-{
-  "op": "add",
-  "path": "/spec/template/spec/containers/0/volumeMounts/1",
-  "value": {
-    "mountPath": "/etc/istio/<user_namespace>-mesh-external/nginx-ca-certs",
-    "name": "<user_namespace>-mesh-external-nginx-ca-certs",
-    "readOnly": true
-  }
-},
-{
-  "op": "add",
-  "path": "/spec/template/spec/volumes/1",
-  "value": {
-  "name": "<user_namespace>-mesh-external-nginx-ca-certs",
-    "secret": {
-      "secretName": "<user_namespace>-mesh-external-nginx-ca-certs",
-      "optional": true
-    }
-  }
-}]
-EOF
-----
-
-* Modify the _Egress Gateway_ deployment
-
-[.console-input]
-[source,input,subs="+macros,+attributes"]
-----
-oc -n istio-system patch --type=json deploy istio-egressgateway -p "$(cat gateway-patch.json)"
-----
-
-.Nginx service with mTLS
-image::jump-app-mesh-egress-patched.png[]
+.Nginx client egress certificate
+image:jump-app-mesh-external-nginx-istio-system-certs.png[]
 
 * Create a _destination rule_ and a _service entry_ to direct the traffic from the egress gateway to the external service
 
@@ -349,34 +284,7 @@ include::partial$oc_process_apply.adoc[]
 .Nginx service destination rule and service entry
 image::jump-app-mesh-nginx-dr-se.png[]
 
-[#06-configureegressaccesstest]
-=== Testing egress traffic
-
-Once the previous steps have been performed, it is time to test the connection between the _Egress Gateway_ and the _external service_
-
-* Check if the certificates exits
-
-[.console-input]
-[source,input,subs="+macros,+attributes"]
-----
-oc exec -n istio-system "$(oc -n istio-system get pods -l istio=egressgateway -o jsonpath='{.items[0].metadata.name}')" -- ls -alR /etc/istio/<user_namespace>-mesh-external
-----
-
-.Nginx service with mTLS
-image::jump-app-mesh-external-nginx-client-certs-ok.png[]
-
-* Test the connection
-
-[.console-input]
-[source,input,subs="+macros,+attributes"]
-----
-oc exec -n istio-system "$(oc -n istio-system get pods -l istio=egressgateway -o jsonpath='{.items[0].metadata.name}')" -- curl -v --cacert /etc/istio/<user_namespace>-mesh-external/nginx-ca-certs/example.com.crt --cert /etc/istio/<user_namespace>-mesh-external/nginx-client-certs/tls.crt --key /etc/istio/<user_namespace>-mesh-external/nginx-client-certs/tls.key https://my-nginx.<user_namespace>-mesh-external.svc.cluster.local -k
-----
-
-.Nginx service with mTLS
-image::jump-app-mesh-external-nginx-client-mtls-ok.png[]
-
-
+[#06-testexternalservice]
 === Test the _external service_
 
 Once you have the _external service_, the _test tool microservice_ and the _Egress Gateway_ configuration deployed, it is time to test the access from the application pod to the _external service_ via _Egress Gateway_:
@@ -386,7 +294,9 @@ Once you have the _external service_, the _test tool microservice_ and the _Egre
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-oc exec "$(oc get pod -l app=sleep -o jsonpath={.items..metadata.name})" -c sleep -- curl -sS http://my-nginx.<user_namespace>-mesh-external.svc.cluster.local -k -v
+oc project <user_namespace>
+POD=$(oc get po -l app=sleep -o jsonpath='{.items[0].metadata.name}')
+oc exec -it $POD -c sleep -- curl -v http://my-nginx.<user_namespace>-mesh-external.svc.cluster.local -k
 ----
 
 .nginx.example.com mTLS connection OK
