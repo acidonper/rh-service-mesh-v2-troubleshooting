@@ -52,7 +52,9 @@ Another tool you have for troubleshooting is the config dump of the Envoy proxie
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-oc exec <back_golang_pod_id> -c istio-proxy -- curl localhost:15000/config_dump > dump.json
+oc project <user_namespace>
+POD=$(oc get po -l app=back-golang -o jsonpath='{.items[0].metadata.name}')
+oc exec -it $POD -c istio-proxy -- curl localhost:15000/config_dump > dump.json
 ----
 
 You will get a very long file that looks like this:
@@ -70,7 +72,9 @@ Envoy also has stats of their proxies that you can see by doing a request to the
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-oc exec <back_golang_pod_id> -c istio-proxy -- curl localhost:15000/stats > stats.txt
+oc project <user_namespace>
+POD=$(oc get po -l app=back-golang -o jsonpath='{.items[0].metadata.name}')
+oc exec -it $POD -c istio-proxy -- curl localhost:15000/stats > stats.txt
 ----
 
 In this file you have different metrics that Envoy collects that you can use to see the current status of the mesh. For example, in the previous lab about Traffic Management you used these stats to see the pending requests in the Circuit Breaking section. You can also see the number of http responses, how many times a specific code came in the response, total requests sent, total bytes sent, etc. 
@@ -85,7 +89,9 @@ Envoy even let you change the logging level inside a sidecar by doing some http 
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-oc exec <back_golang_pod_id> -c istio-proxy -- curl -X POST localhost:15000/logging
+oc project <user_namespace>
+POD=$(oc get po -l app=back-golang -o jsonpath='{.items[0].metadata.name}')
+oc exec -it $POD -c istio-proxy -- curl -X POST localhost:15000/logging
 ----
 
 You'll get something similar to this, which is the list of loggers you can edit to see more information:
@@ -98,7 +104,9 @@ Now, you will change the level of one of them:
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-oc exec <back_golang_pod_id> -c istio-proxy -- curl -X POST localhost:15000/logging?http=debug
+oc project <user_namespace>
+POD=$(oc get po -l app=back-golang -o jsonpath='{.items[0].metadata.name}')
+oc exec -it $POD -c istio-proxy -- curl -X POST localhost:15000/logging\?http=debug
 ----
 
 To check it, run the following command:
@@ -106,7 +114,9 @@ To check it, run the following command:
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-oc logs -f <back_golang_pod_id> -c istio-proxy
+oc project <user_namespace>
+POD=$(oc get po -l app=back-golang -o jsonpath='{.items[0].metadata.name}')
+oc logs -f $POD -c istio-proxy
 ----
 
 You should start seeing http debug logs for that sidecar. 

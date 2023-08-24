@@ -100,7 +100,8 @@ image::ocp-routers-pods.png[]
 [source,input,subs="+macros,+attributes"]
 ----
 oc project openshift-ingress
-oc rsh <router_pod_id> 
+POD=$(oc get po -o jsonpath='{.items[0].metadata.name}' -n openshift-ingress)
+oc rsh $POD
 ----
 
 * Execute a HTTP request using curl command
@@ -172,7 +173,8 @@ image::ocp-istio-controlplane-pods.png[]
 [source,input,subs="+macros,+attributes"]
 ----
 oc project istio-system
-oc rsh <ingress_gateway_pod_id> 
+POD=$(oc get po -l app=istio-ingressgateway -o jsonpath='{.items[0].metadata.name}' -n istio-system)
+oc rsh $POD
 ----
 
 * Execute a HTTP request using curl command
@@ -278,10 +280,10 @@ image::ocp-istio-controlplane-pods.png[]
 [source,input,subs="+macros,+attributes"]
 ----
 oc project istio-system
-oc exec <ingress_gateway_pod_id> -- mkdir /tmp/<user_namespace>
-oc cp istio.test.crt <ingress_gateway_pod_id>:/tmp/<user_namespace>
-oc cp istio.test.key <ingress_gateway_pod_id>:/tmp/<user_namespace>
-oc cp ca-cert.pem <ingress_gateway_pod_id>:/tmp/<user_namespace>
+oc exec <ingress_gateway_pod_id> -- mkdir /var/run/secrets/workload-spiffe-credentials/tmp/<user_namespace>
+oc cp istio.test.crt <ingress_gateway_pod_id>:/var/run/secrets/workload-spiffe-credentials/tmp/<user_namespace>
+oc cp istio.test.key <ingress_gateway_pod_id>:/var/run/secrets/workload-spiffe-credentials/tmp/<user_namespace>
+oc cp ca-cert.pem <ingress_gateway_pod_id>:/var/run/secrets/workload-spiffe-credentials/tmp/<user_namespace>
 ----
 
 * Connect to the _Ingress Gateway_ pod
@@ -291,8 +293,9 @@ oc cp ca-cert.pem <ingress_gateway_pod_id>:/tmp/<user_namespace>
 [source,input,subs="+macros,+attributes"]
 ----
 oc project istio-system
-oc rsh <ingress_gateway_pod_id> 
-cd /tmp/<user_namespace>
+POD=$(oc get po -l app=istio-ingressgateway -o jsonpath='{.items[0].metadata.name}' -n istio-system)
+oc rsh $POD 
+cd /var/run/secrets/workload-spiffe-credentials/tmp/<user_namespace>
 ----
 
 * Perform a HTTP request to the k8s service _back-golang_ using curl command

@@ -1,0 +1,50 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: 02-jump-app-drs
+objects:
+  - apiVersion: networking.istio.io/v1alpha3
+    kind: DestinationRule
+    metadata:
+      name: back-golang
+    spec:
+      host: back-golang.${USER_NAMESPACE}.svc.cluster.local
+      subsets:
+      - name: v1
+        labels:
+          version: v1
+  - apiVersion: networking.istio.io/v1alpha3
+    kind: DestinationRule
+    metadata:
+      name: back-python
+    spec:
+      host: back-python.${USER_NAMESPACE}.svc.cluster.local
+      subsets:
+      - name: v1
+        labels:
+          version: v1
+  - apiVersion: networking.istio.io/v1alpha3
+    kind: DestinationRule
+    metadata:
+      name: back-springboot
+    spec:
+      host: back-springboot.${USER_NAMESPACE}.svc.cluster.local
+      subsets:
+      - name: v1
+        labels:
+          version: v1
+  - apiVersion: networking.istio.io/v1alpha3
+    kind: DestinationRule
+    metadata:
+      name: front-javascript
+    spec:
+      host: front-javascript.${USER_NAMESPACE}.svc.cluster.local
+      subsets:
+      - name: v1
+        labels:
+          version: v1
+parameters:
+  - description: Tutorial User Namespace
+    displayName: Tutorial User Namespace
+    name: USER_NAMESPACE
+    required: true

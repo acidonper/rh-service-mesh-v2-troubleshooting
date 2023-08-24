@@ -1,0 +1,69 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: 03-jump-app-services
+objects:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: back-golang
+      name: back-golang
+    spec:
+      ports:
+        - name: http-8442
+          port: 8442
+          protocol: TCP
+          targetPort: 8442   
+      selector:
+        app: back-golang
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: back-python
+      name: back-python
+    spec:
+      ports:
+        - name: http-8080
+          port: 8444
+          protocol: TCP
+          targetPort: 8080   
+      selector:
+        app: back-python
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: back-springboot
+      name: back-springboot
+    spec:
+      ports:
+        - name: http-8080
+          port: 8080
+          protocol: TCP
+          targetPort: 8080
+        - name: http-8443
+          port: 8443
+          protocol: TCP
+          targetPort: 8443
+        - name: http-8778
+          port: 8778
+          protocol: TCP
+          targetPort: 8778   
+      selector:
+        app: back-springboot
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: front-javascript
+      name: front-javascript
+    spec:
+      ports:
+        - name: http-8080
+          port: 8080
+          protocol: TCP
+          targetPort: 3000   
+      selector:
+        app: front-javascript

@@ -1,0 +1,28 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: 00-jump-app-golang-route
+objects:
+  - apiVersion: route.openshift.io/v1
+    kind: Route
+    metadata:
+      name: back-golang-${USER_NAMESPACE}
+    spec:
+      host: back-golang-${USER_NAMESPACE}.${OCP_APPS_DOMAIN}
+      to:
+        kind: Service
+        name: istio-ingressgateway
+      tls:
+        termination: passthrough
+        insecureEdgeTerminationPolicy: Redirect
+      port:
+        targetPort: http2
+parameters:
+  - description: Tutorial User Namespace
+    displayName: Tutorial User Namespace
+    name: USER_NAMESPACE
+    required: true
+  - description: Openshift Apps Domain
+    displayName: Openshift Apps Domain
+    name: OCP_APPS_DOMAIN
+    required: true
