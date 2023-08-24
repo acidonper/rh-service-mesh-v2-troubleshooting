@@ -71,6 +71,5 @@
 *** xref:06-egress-traffic.adoc#06-createsevstest[6.3.4 Test Nginx service through testing tool]
 ** xref:06-egress-traffic.adoc#06-configureegressaccess[6.4 Configure mutual TLS origination for egress traffic]
 *** xref:06-egress-traffic.adoc#06-configureegressaccesstest[6.4.1 Testing egress traffic]
-** xref:06-egress-traffic.adoc#06-finalquestion[6.5 Final Question]
 
 * xref:07-tools.adoc[7. Troubleshooting Tools]
