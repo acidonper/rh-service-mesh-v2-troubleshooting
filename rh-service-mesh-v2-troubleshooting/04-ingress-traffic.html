@@ -7,7 +7,7 @@
     <link rel="canonical" href="http://localhost:3000/rhs-build-course/index.html/rh-service-mesh-v2-troubleshooting/04-ingress-traffic.html">
     <link rel="prev" href="03-flows.html">
     <link rel="next" href="05-secure-ingress-traffic.html">
-    <meta name="generator" content="Antora 2.3.4">
+    <meta name="generator" content="Antora 3.0.0">
     <link rel="stylesheet" href="../_/css/site.css">
 <link rel="icon" href="../_/img/favicon.ico" type="image/x-icon">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -139,13 +139,13 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="03-flows.html#routes">3.3.2 Configure Routes</a>
   </li>
-  <li class="nav-item" data-depth="3">
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="03-flows.html#test">3.4 Confirm Jump App is running again</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="03-flows.html#03-kiali">3.5 Visit Kiali</a>
-  </li>
-</ul>
   </li>
 </ul>
   </li>
@@ -327,9 +327,6 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="06-egress-traffic.html#06-finalquestion">6.5 Final Question</a>
-  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="1">
@@ -349,7 +346,7 @@
     <li class="component is-current">
       <span class="title">Red Hat Service Mesh - Troubleshooting</span>
       <ul class="versions">
-        <li class="version is-current is-latest">
+        <li class="version is-current">
           <a href="index.html">master</a>
         </li>
       </ul>
@@ -600,7 +597,8 @@ An error message appears when the frontend tries to call backend services
 <div class="listingblock lines_7 console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project openshift-ingress
-oc rsh &lt;router_pod_id&gt;</code></pre>
+POD=$(oc get po -o jsonpath='{.items[0].metadata.name}' -n openshift-ingress)
+oc rsh $POD</code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -688,7 +686,8 @@ Note that the error is 404 because of the route, or path, is not found
 <div class="listingblock lines_7 console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project openshift-ingress
-oc rsh &lt;router_pod_id&gt;</code></pre>
+POD=$(oc get po -o jsonpath='{.items[0].metadata.name}' -n openshift-ingress)
+oc rsh $POD</code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -751,7 +750,7 @@ At this time, you obtain a 503 error because the service is unavailable but this
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/ocp-routers-pods.png" alt="ocp routers pods">
+<img src="_images/ocp-istio-controlplane-pods.png" alt="ocp istio controlplane pods">
 </div>
 <div class="title">Figure 13. Istio ControlPlane Pods</div>
 </div>
@@ -765,7 +764,8 @@ At this time, you obtain a 503 error because the service is unavailable but this
 <div class="listingblock lines_7 console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project istio-system
-oc rsh &lt;ingress_gateway_pod_id&gt;</code></pre>
+POD=$(oc get po -l app=istio-ingressgateway -o jsonpath='{.items[0].metadata.name}' -n istio-system)
+oc rsh $POD</code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -835,7 +835,7 @@ At this time, you obtain <em>"Could not resolve host: back-golang.user1-namespac
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/ocp-routers-pods.png" alt="ocp routers pods">
+<img src="_images/ocp-istio-controlplane-pods.png" alt="ocp istio controlplane pods">
 </div>
 <div class="title">Figure 16. Istio ControlPlane Pods</div>
 </div>
@@ -849,7 +849,8 @@ At this time, you obtain <em>"Could not resolve host: back-golang.user1-namespac
 <div class="listingblock lines_7 console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project istio-system
-oc rsh &lt;ingress_gateway_pod_id&gt;</code></pre>
+POD=$(oc get po -l app=istio-ingressgateway -o jsonpath='{.items[0].metadata.name}' -n istio-system)
+oc rsh $POD</code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -861,7 +862,7 @@ oc rsh &lt;ingress_gateway_pod_id&gt;</code></pre>
 </div>
 <div class="listingblock lines_7 console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">curl -XGET -v --header "Host: back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;" <a href="http://back-golang.&lt;user_namespace&gt;.svc.cluster.local:8442" class="bare">http://back-golang.&lt;user_namespace&gt;.svc.cluster.local:8442</a> -v</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">curl -XGET -v --header "Host: back-golang-&lt;user_namespace&gt;.&lt;openshift_apps_domain&gt;" <a href="http://localhost:8080" class="bare">http://localhost:8080</a> -v</code></pre>
 </div>
 </div>
 <div class="imageblock">
@@ -946,7 +947,8 @@ At this time, you obtain a 503 error because the service is unavailable but the 
 <div class="listingblock lines_7 console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project istio-system
-oc rsh &lt;ingress_gateway_pod_id&gt;</code></pre>
+POD=$(oc get po -l app=istio-ingressgateway -o jsonpath='{.items[0].metadata.name}' -n istio-system)
+oc rsh $POD</code></pre>
 </div>
 </div>
 <div class="ulist">

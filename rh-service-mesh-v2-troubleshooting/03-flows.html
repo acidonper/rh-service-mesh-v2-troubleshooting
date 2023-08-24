@@ -7,7 +7,7 @@
     <link rel="canonical" href="http://localhost:3000/rhs-build-course/index.html/rh-service-mesh-v2-troubleshooting/03-flows.html">
     <link rel="prev" href="02-jumpapp.html">
     <link rel="next" href="04-ingress-traffic.html">
-    <meta name="generator" content="Antora 2.3.4">
+    <meta name="generator" content="Antora 3.0.0">
     <link rel="stylesheet" href="../_/css/site.css">
 <link rel="icon" href="../_/img/favicon.ico" type="image/x-icon">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -139,13 +139,13 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="#routes">3.3.2 Configure Routes</a>
   </li>
-  <li class="nav-item" data-depth="3">
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="#test">3.4 Confirm Jump App is running again</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="#03-kiali">3.5 Visit Kiali</a>
-  </li>
-</ul>
   </li>
 </ul>
   </li>
@@ -327,9 +327,6 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="06-egress-traffic.html#06-finalquestion">6.5 Final Question</a>
-  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="1">
@@ -349,7 +346,7 @@
     <li class="component is-current">
       <span class="title">Red Hat Service Mesh - Troubleshooting</span>
       <ul class="versions">
-        <li class="version is-current is-latest">
+        <li class="version is-current">
           <a href="index.html">master</a>
         </li>
       </ul>
@@ -591,17 +588,6 @@ Please, replace <strong>&lt;user_namespace&gt;</strong> with the value provided 
 </div>
 <div class="title">Figure 12. Back Golang Patched</div>
 </div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc patch deployment mongo -p '{"spec":{"template":{"metadata":{"annotations":{"sidecar.istio.io/inject":"true"}}}}}' -n &lt;user_namespace&gt;</code></pre>
-</div>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/jump-app-back-mg-depl-patch.png" alt="jump app back mg depl patch">
-</div>
-<div class="title">Figure 13. MongoDB Patched</div>
-</div>
 <div class="paragraph">
 <p>Before continuing with the following steps, please test Jump App <em>pods</em> status, in order to be sure that 2 replicas are running for each microservice:</p>
 </div>
@@ -614,7 +600,7 @@ Please, replace <strong>&lt;user_namespace&gt;</strong> with the value provided 
 <div class="content">
 <img src="_images/jump-app-pods-2-ok.png" alt="jump app pods 2 ok">
 </div>
-<div class="title">Figure 14. Jump App Pods Mesh</div>
+<div class="title">Figure 13. Jump App Pods Mesh</div>
 </div>
 </div>
 <div class="sect2">
@@ -629,14 +615,14 @@ Please, replace <strong>&lt;user_namespace&gt;</strong> with the value provided 
 <h4 id="_delete_all_current_routes_in_user_namespace"><a class="anchor" href="#_delete_all_current_routes_in_user_namespace"></a><strong>Delete all current routes in &lt;user_namespace&gt;</strong></h4>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get routes -n &lt;user_namespace&gt; | grep -v NAME | awk '{print "oc delete route " $1}' | sh</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get routes -n &lt;user_namespace&gt; | grep -v NAME | awk '{print "oc delete route " $1 " -n &lt;user_namespace&gt;"}' | sh</code></pre>
 </div>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="_images/jump-app-route-del.png" alt="jump app route del">
 </div>
-<div class="title">Figure 15. Jump App Routes Deleted</div>
+<div class="title">Figure 14. Jump App Routes Deleted</div>
 </div>
 </div>
 <div class="sect3">
@@ -656,7 +642,7 @@ Please, replace <strong>&lt;user_namespace&gt;</strong> with the value provided 
 <div class="content">
 <img src="_images/jump-app-routes-mesh-ok.png" alt="jump app routes mesh ok">
 </div>
-<div class="title">Figure 16. Mesh Routes Created</div>
+<div class="title">Figure 15. Mesh Routes Created</div>
 </div>
 </div>
 </div>
@@ -696,7 +682,7 @@ Look at the number of containers in each microservice, it must contains 2 contai
 <div class="content">
 <img src="_images/jump-app-pods-2-ok.png" alt="jump app pods 2 ok">
 </div>
-<div class="title">Figure 17. Jump App Pods Mesh</div>
+<div class="title">Figure 16. Jump App Pods Mesh</div>
 </div>
 <div class="ulist">
 <ul>
@@ -714,7 +700,7 @@ Look at the number of containers in each microservice, it must contains 2 contai
 <div class="content">
 <img src="_images/jump-app-get-routes-mesh-ok.png" alt="jump app get routes mesh ok">
 </div>
-<div class="title">Figure 18. Jump App Routes</div>
+<div class="title">Figure 17. Jump App Routes</div>
 </div>
 <div class="ulist">
 <ul>
@@ -727,7 +713,7 @@ Look at the number of containers in each microservice, it must contains 2 contai
 <div class="content">
 <img src="_images/jump-app-back-ok.png" alt="jump app back ok">
 </div>
-<div class="title">Figure 19. Jump App Back</div>
+<div class="title">Figure 18. Jump App Back</div>
 </div>
 <div class="ulist">
 <ul>
@@ -745,7 +731,7 @@ Look at the number of containers in each microservice, it must contains 2 contai
 <div class="content">
 <img src="_images/jump-app-front-jumps-ok.png" alt="jump app front jumps ok">
 </div>
-<div class="title">Figure 20. Jump App Front Web UI Multi Jumps</div>
+<div class="title">Figure 19. Jump App Front Web UI Multi Jumps</div>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -763,7 +749,7 @@ It is required to accept <strong>self-signed certificates</strong> provided by O
 <div class="content">
 <img src="_images/certs_warning.png" alt="certs warning" width="50%">
 </div>
-<div class="title">Figure 21. Openshift Self-signed Certificates Warning</div>
+<div class="title">Figure 20. Openshift Self-signed Certificates Warning</div>
 </div>
 </div>
 </div>
@@ -777,7 +763,7 @@ It is required to accept <strong>self-signed certificates</strong> provided by O
 <div class="content">
 <img src="_images/jump-app-kiali.png" alt="jump app kiali">
 </div>
-<div class="title">Figure 22. Kiali Console</div>
+<div class="title">Figure 21. Kiali Console</div>
 </div>
 </div>
 </div>

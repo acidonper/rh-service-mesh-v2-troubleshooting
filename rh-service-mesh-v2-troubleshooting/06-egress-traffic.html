@@ -7,7 +7,7 @@
     <link rel="canonical" href="http://localhost:3000/rhs-build-course/index.html/rh-service-mesh-v2-troubleshooting/06-egress-traffic.html">
     <link rel="prev" href="05-secure-ingress-traffic.html">
     <link rel="next" href="07-tools.html">
-    <meta name="generator" content="Antora 2.3.4">
+    <meta name="generator" content="Antora 3.0.0">
     <link rel="stylesheet" href="../_/css/site.css">
 <link rel="icon" href="../_/img/favicon.ico" type="image/x-icon">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -139,13 +139,13 @@
   <li class="nav-item" data-depth="3">
     <a class="nav-link" href="03-flows.html#routes">3.3.2 Configure Routes</a>
   </li>
-  <li class="nav-item" data-depth="3">
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="03-flows.html#test">3.4 Confirm Jump App is running again</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="03-flows.html#03-kiali">3.5 Visit Kiali</a>
-  </li>
-</ul>
   </li>
 </ul>
   </li>
@@ -327,9 +327,6 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#06-finalquestion">6.5 Final Question</a>
-  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="1">
@@ -349,7 +346,7 @@
     <li class="component is-current">
       <span class="title">Red Hat Service Mesh - Troubleshooting</span>
       <ul class="versions">
-        <li class="version is-current is-latest">
+        <li class="version is-current">
           <a href="index.html">master</a>
         </li>
       </ul>
@@ -575,7 +572,9 @@ oc create -n &lt;user_namespace&gt;-mesh-external secret tls nginx-server-certs 
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc -n &lt;user_namespace&gt;-mesh-external rsh &lt;nginx_pod_id&gt;  curl localhost:443 -k -v</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project &lt;user_namespace&gt;-mesh-external
+POD=$(oc get po -l run=my-nginx -o jsonpath='{.items[0].metadata.name}')
+oc rsh $POD curl localhost:443 -k -v</code></pre>
 </div>
 </div>
 <div class="imageblock">
@@ -711,7 +710,9 @@ oc create -n &lt;user_namespace&gt; secret tls nginx-client-certs --key client.e
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc -n &lt;user_namespace&gt; exec -it &lt;testing_pod_id&gt; -c sleep -- curl -v --cacert /etc/nginx-ca-certs/example.com.crt --cert /etc/nginx-client-certs/tls.crt --key /etc/nginx-client-certs/tls.key <a href="https://my-nginx.&lt;user_namespace&gt;-mesh-external.svc.cluster.local" class="bare">https://my-nginx.&lt;user_namespace&gt;-mesh-external.svc.cluster.local</a> -k</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project &lt;user_namespace&gt;
+POD=$(oc get po -l app=sleep -o jsonpath='{.items[0].metadata.name}')
+oc exec -it $POD -c sleep -- curl -v --cacert /etc/nginx-ca-certs/example.com.crt --cert /etc/nginx-client-certs/tls.crt --key /etc/nginx-client-certs/tls.key <a href="https://my-nginx.&lt;user_namespace&gt;-mesh-external.svc.cluster.local" class="bare">https://my-nginx.&lt;user_namespace&gt;-mesh-external.svc.cluster.local</a> -k</code></pre>
 </div>
 </div>
 <div class="imageblock">
@@ -729,7 +730,9 @@ oc create -n &lt;user_namespace&gt; secret tls nginx-client-certs --key client.e
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc -n &lt;user_namespace&gt; exec -it &lt;testing_pod_id&gt; -c sleep -- curl -v <a href="https://my-nginx.&lt;user_namespace&gt;-mesh-external.svc.cluster.local" class="bare">https://my-nginx.&lt;user_namespace&gt;-mesh-external.svc.cluster.local</a> -k</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project &lt;user_namespace&gt;
+POD=$(oc get po -l app=sleep -o jsonpath='{.items[0].metadata.name}')
+oc exec -it $POD -c sleep -- curl -v <a href="https://my-nginx.&lt;user_namespace&gt;-mesh-external.svc.cluster.local" class="bare">https://my-nginx.&lt;user_namespace&gt;-mesh-external.svc.cluster.local</a> -k</code></pre>
 </div>
 </div>
 <div class="imageblock">
@@ -808,109 +811,18 @@ You have deployed a nginx mTLS service and you are receiving a <em>400 Bad Reque
 <div class="ulist">
 <ul>
 <li>
-<p>Create the CA certificate in a Kubernetes secret</p>
+<p>Create the TLS certificate in a Kubernetes secret</p>
 </li>
 </ul>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc create -n istio-system secret generic &lt;user_namespace&gt;-mesh-external-nginx-ca-certs --from-file=example.com.crt</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc create secret -n istio-system generic &lt;user_namespace&gt;-mesh-external-egress-nginx-client-certs  --from-file=tls.key=client.example.com.key  --from-file=tls.crt=client.example.com.crt  --from-file=ca.crt=example.com.crt</code></pre>
 </div>
 </div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/jump-app-mesh-external-nginx-istio-system-cert-ca.png" alt="jump app mesh external nginx istio system cert ca">
-</div>
-<div class="title">Figure 14. Nginx service with mTLS</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Create the client mTLS certificates in another Kubernetes secret</p>
-</li>
-</ul>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc create -n istio-system secret tls &lt;user_namespace&gt;-mesh-external-nginx-client-certs --key client.example.com.key --cert client.example.com.crt</code></pre>
-</div>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/jump-app-mesh-external-nginx-istio-system-cert.png" alt="jump app mesh external nginx istio system cert">
-</div>
-<div class="title">Figure 15. Nginx service with mTLS</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Create a <em>patch</em> file in order to edit the <em>Egress Gateway</em> deployment</p>
-</li>
-</ul>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">cat &gt; gateway-patch.json &lt;&lt;EOF
-[{
-  "op": "add",
-  "path": "/spec/template/spec/containers/0/volumeMounts/0",
-  "value": {
-    "mountPath": "/etc/istio/&lt;user_namespace&gt;-mesh-external/nginx-client-certs",
-    "name": "&lt;user_namespace&gt;-mesh-external-nginx-client-certs",
-    "readOnly": true
-  }
-},
-{
-  "op": "add",
-  "path": "/spec/template/spec/volumes/0",
-  "value": {
-  "name": "&lt;user_namespace&gt;-mesh-external-nginx-client-certs",
-    "secret": {
-      "secretName": "&lt;user_namespace&gt;-mesh-external-nginx-client-certs",
-      "optional": true
-    }
-  }
-},
-{
-  "op": "add",
-  "path": "/spec/template/spec/containers/0/volumeMounts/1",
-  "value": {
-    "mountPath": "/etc/istio/&lt;user_namespace&gt;-mesh-external/nginx-ca-certs",
-    "name": "&lt;user_namespace&gt;-mesh-external-nginx-ca-certs",
-    "readOnly": true
-  }
-},
-{
-  "op": "add",
-  "path": "/spec/template/spec/volumes/1",
-  "value": {
-  "name": "&lt;user_namespace&gt;-mesh-external-nginx-ca-certs",
-    "secret": {
-      "secretName": "&lt;user_namespace&gt;-mesh-external-nginx-ca-certs",
-      "optional": true
-    }
-  }
-}]
-EOF</code></pre>
-</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Modify the <em>Egress Gateway</em> deployment</p>
-</li>
-</ul>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc -n istio-system patch --type=json deploy istio-egressgateway -p "$(cat gateway-patch.json)"</code></pre>
-</div>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/jump-app-mesh-egress-patched.png" alt="jump app mesh egress patched">
-</div>
-<div class="title">Figure 16. Nginx service with mTLS</div>
+<div class="paragraph">
+<div class="title">Nginx client egress certificate</div>
+<p><span class="image"><img src="_images/jump-app-mesh-external-nginx-istio-system-certs.png" alt="jump app mesh external nginx istio system certs"></span></p>
 </div>
 <div class="ulist">
 <ul>
@@ -921,60 +833,18 @@ EOF</code></pre>
 </div>
 <div class="listingblock lines_space console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 06-secure-egress-traffic-troubleshooting/03-istio-system-dr.yml --param-file=params.env --ignore-unknown-parameters | oc apply -f - -n istio-system</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc process -f 06-secure-egress-traffic-troubleshooting/03-istio-system-dr-sds.yml --param-file=params.env --ignore-unknown-parameters | oc apply -f - -n istio-system</code></pre>
 </div>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="_images/jump-app-mesh-nginx-dr-se.png" alt="jump app mesh nginx dr se">
 </div>
-<div class="title">Figure 17. Nginx service destination rule and service entry</div>
+<div class="title">Figure 14. Nginx service destination rule and service entry</div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="06-configureegressaccesstest"><a class="anchor" href="#06-configureegressaccesstest"></a>Testing egress traffic</h3>
-<div class="paragraph">
-<p>Once the previous steps have been performed, it is time to test the connection between the <em>Egress Gateway</em> and the <em>external service</em></p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Check if the certificates exits</p>
-</li>
-</ul>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc exec -n istio-system "$(oc -n istio-system get pods -l istio=egressgateway -o jsonpath='{.items[0].metadata.name}')" -- ls -alR /etc/istio/&lt;user_namespace&gt;-mesh-external</code></pre>
-</div>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/jump-app-mesh-external-nginx-client-certs-ok.png" alt="jump app mesh external nginx client certs ok">
-</div>
-<div class="title">Figure 18. Nginx service with mTLS</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Test the connection</p>
-</li>
-</ul>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc exec -n istio-system "$(oc -n istio-system get pods -l istio=egressgateway -o jsonpath='{.items[0].metadata.name}')" -- curl -v --cacert /etc/istio/&lt;user_namespace&gt;-mesh-external/nginx-ca-certs/example.com.crt --cert /etc/istio/&lt;user_namespace&gt;-mesh-external/nginx-client-certs/tls.crt --key /etc/istio/&lt;user_namespace&gt;-mesh-external/nginx-client-certs/tls.key <a href="https://my-nginx.&lt;user_namespace&gt;-mesh-external.svc.cluster.local" class="bare">https://my-nginx.&lt;user_namespace&gt;-mesh-external.svc.cluster.local</a> -k</code></pre>
-</div>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/jump-app-mesh-external-nginx-client-mtls-ok.png" alt="jump app mesh external nginx client mtls ok">
-</div>
-<div class="title">Figure 19. Nginx service with mTLS</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_test_the_external_service"><a class="anchor" href="#_test_the_external_service"></a>Test the <em>external service</em></h3>
+<h3 id="06-testexternalservice"><a class="anchor" href="#06-testexternalservice"></a>Test the <em>external service</em></h3>
 <div class="paragraph">
 <p>Once you have the <em>external service</em>, the <em>test tool microservice</em> and the <em>Egress Gateway</em> configuration deployed, it is time to test the access from the application pod to the <em>external service</em> via <em>Egress Gateway</em>:</p>
 </div>
@@ -987,14 +857,16 @@ EOF</code></pre>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc exec "$(oc get pod -l app=sleep -o jsonpath={.items..metadata.name})" -c sleep -- curl -sS <a href="http://my-nginx.&lt;user_namespace&gt;-mesh-external.svc.cluster.local" class="bare">http://my-nginx.&lt;user_namespace&gt;-mesh-external.svc.cluster.local</a> -k -v</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc project &lt;user_namespace&gt;
+POD=$(oc get po -l app=sleep -o jsonpath='{.items[0].metadata.name}')
+oc exec -it $POD -c sleep -- curl -v <a href="http://my-nginx.&lt;user_namespace&gt;-mesh-external.svc.cluster.local" class="bare">http://my-nginx.&lt;user_namespace&gt;-mesh-external.svc.cluster.local</a> -k</code></pre>
 </div>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="_images/jump-app-mesh-external-nginx-access-egress-con-ok-mtls.png" alt="jump app mesh external nginx access egress con ok mtls">
 </div>
-<div class="title">Figure 20. nginx.example.com mTLS connection OK</div>
+<div class="title">Figure 15. nginx.example.com mTLS connection OK</div>
 </div>
 </div>
 </div>
