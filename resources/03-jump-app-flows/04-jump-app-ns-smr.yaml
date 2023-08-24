@@ -1,0 +1,13 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: 04-jump-app-ns-smr
+objects:
+  - apiVersion: maistra.io/v1
+    kind: ServiceMeshMember
+    metadata:
+      name: default
+    spec:
+      controlPlaneRef:
+        name: basic
+        namespace: istio-system

@@ -1,0 +1,42 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: 05-jump-app-routes
+objects:
+  - apiVersion: route.openshift.io/v1
+    kind: Route
+    metadata:
+      name: back-golang-${USER_NAMESPACE}
+    spec:
+      host: back-golang-${USER_NAMESPACE}.${OCP_APPS_DOMAIN}
+      to:
+        kind: Service
+        name: istio-ingressgateway
+      tls:
+        termination: edge
+        insecureEdgeTerminationPolicy: Redirect
+      port:
+        targetPort: http2
+  - apiVersion: route.openshift.io/v1
+    kind: Route
+    metadata:
+      name: front-javascript-${USER_NAMESPACE}
+    spec:
+      host: front-javascript-${USER_NAMESPACE}.${OCP_APPS_DOMAIN}
+      to:
+        kind: Service
+        name: istio-ingressgateway
+      tls:
+        termination: edge
+        insecureEdgeTerminationPolicy: Redirect
+      port:
+        targetPort: http2
+parameters:
+  - description: Tutorial User Namespace
+    displayName: Tutorial User Namespace
+    name: USER_NAMESPACE
+    required: true
+  - description: Openshift Apps Domain
+    displayName: Openshift Apps Domain
+    name: OCP_APPS_DOMAIN
+    required: true

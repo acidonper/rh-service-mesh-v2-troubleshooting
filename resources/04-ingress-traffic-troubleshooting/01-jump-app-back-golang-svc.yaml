@@ -1,0 +1,28 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: 00-jump-app-ingress-customization-gw
+objects:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: back-golang
+      name: back-golang
+    spec:
+      ports:
+        - name: http-8442
+          port: 8442
+          protocol: TCP
+          targetPort: 8442   
+      selector:
+        app: back-golang
+parameters:
+  - description: Tutorial User Namespace
+    displayName: Tutorial User Namespace
+    name: USER_NAMESPACE
+    required: true
+  - description: Openshift Apps Domain
+    displayName: Openshift Apps Domain
+    name: OCP_APPS_DOMAIN
+    required: true

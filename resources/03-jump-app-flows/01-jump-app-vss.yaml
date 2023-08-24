@@ -1,0 +1,82 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: 01-jump-app-vss
+objects:
+  - apiVersion: networking.istio.io/v1alpha3
+    kind: VirtualService
+    metadata:
+      name: back-golang
+    spec:
+      gateways:
+      - back-golang
+      - mesh
+      hosts:
+      - back-golang-${USER_NAMESPACE}.${OCP_APPS_DOMAIN}
+      - back-golang.${USER_NAMESPACE}.svc.cluster.local
+      - back-golang
+      http:
+      - route:
+          - destination:
+              host: back-golang.${USER_NAMESPACE}.svc.cluster.local
+              subset: v1
+            weight: 100
+  - apiVersion: networking.istio.io/v1alpha3
+    kind: VirtualService
+    metadata:
+      name: back-python
+    spec:
+      gateways:
+      - mesh
+      hosts:
+      - back-python.${USER_NAMESPACE}.svc.cluster.local
+      - back-python
+      http:
+      - route:
+          - destination:
+              host: back-python.${USER_NAMESPACE}.svc.cluster.local
+              subset: v1
+            weight: 100
+  - apiVersion: networking.istio.io/v1alpha3
+    kind: VirtualService
+    metadata:
+      name: back-springboot
+    spec:
+      gateways:
+      - mesh
+      hosts:
+      - back-springboot.${USER_NAMESPACE}.svc.cluster.local
+      - back-springboot
+      http:
+      - route:
+          - destination:
+              host: back-springboot.${USER_NAMESPACE}.svc.cluster.local
+              subset: v1
+            weight: 100
+  - apiVersion: networking.istio.io/v1alpha3
+    kind: VirtualService
+    metadata:
+      name: front-javascript
+    spec:
+      gateways:
+      - front-javascript
+      - mesh
+      hosts:
+      - front-javascript-${USER_NAMESPACE}.${OCP_APPS_DOMAIN}
+      - front-javascript.${USER_NAMESPACE}.svc.cluster.local
+      - front-javascript
+      http:
+      - route:
+          - destination:
+              host: front-javascript.${USER_NAMESPACE}.svc.cluster.local
+              subset: v1
+            weight: 100
+parameters:
+  - description: Tutorial User Namespace
+    displayName: Tutorial User Namespace
+    name: USER_NAMESPACE
+    required: true
+  - description: Openshift Apps Domain
+    displayName: Openshift Apps Domain
+    name: OCP_APPS_DOMAIN
+    required: true
